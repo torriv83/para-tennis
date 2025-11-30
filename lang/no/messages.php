@@ -88,6 +88,7 @@ return [
     'championship_final' => 'Mesterskapsfinale',
     'top_2_compete' => 'Topp 2 spillere konkurrerer om tittelen',
     'tournament_champion' => 'Turneringsvinner',
+    'round_robin_winner' => 'Vinner av grunnspillet',
     'won_by_walkover' => 'Vant via walkover',
     'defeated' => 'Beseiret',
     'enter_final_result' => 'Registrer finaleresultat',

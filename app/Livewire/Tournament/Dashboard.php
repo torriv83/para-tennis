@@ -41,11 +41,11 @@ class Dashboard extends Component
 
     public string $editFormat = '';
 
-    public function mount(): void
+    public function mount(?Tournament $tournament = null): void
     {
-        $this->tournament = Tournament::with(['players', 'games.player1', 'games.player2'])
-            ->latest()
-            ->first();
+        if ($tournament?->id) {
+            $this->tournament = $tournament->load(['players', 'games.player1', 'games.player2']);
+        }
 
         $this->startDate = now()->format('Y-m-d');
         $this->endDate = now()->addDays(2)->format('Y-m-d');
@@ -60,16 +60,14 @@ class Dashboard extends Component
             'tournamentFormat' => 'required|in:round_robin,round_robin_finals',
         ]);
 
-        $this->tournament = Tournament::create([
+        $tournament = Tournament::create([
             'name' => $validated['tournamentName'],
             'start_date' => $validated['startDate'],
             'end_date' => $validated['endDate'],
             'format' => $validated['tournamentFormat'],
         ]);
 
-        $this->reset(['tournamentName', 'startDate', 'endDate', 'tournamentFormat']);
-        $this->startDate = now()->format('Y-m-d');
-        $this->endDate = now()->addDays(2)->format('Y-m-d');
+        $this->redirect(route('home', $tournament), navigate: true);
     }
 
     public function addPlayer(): void
@@ -228,13 +226,15 @@ class Dashboard extends Component
 
     public function newTournament(): void
     {
-        $this->tournament = null;
+        $this->redirect(route('home'), navigate: true);
     }
 
     public function selectTournament(int $tournamentId): void
     {
-        $this->tournament = Tournament::with(['players', 'games.player1', 'games.player2'])
-            ->find($tournamentId);
+        $tournament = Tournament::find($tournamentId);
+        if ($tournament) {
+            $this->redirect(route('home', $tournament), navigate: true);
+        }
     }
 
     public function addPlayerAndUpdateSchedule(): void
@@ -447,20 +447,33 @@ class Dashboard extends Component
     #[Computed]
     public function tournamentChampion(): ?Player
     {
-        $final = $this->finalMatch;
-        if (! $final || ! $final->completed) {
-            return null;
+        // For round_robin_finals format, champion is determined by final match
+        if ($this->tournament?->format === TournamentFormat::RoundRobinFinals) {
+            $final = $this->finalMatch;
+            if (! $final || ! $final->completed) {
+                return null;
+            }
+
+            if ($final->is_walkover) {
+                return Player::find($final->walkover_winner_id);
+            }
+
+            if ($final->player1_sets > $final->player2_sets) {
+                return $final->player1;
+            }
+
+            return $final->player2;
         }
 
-        if ($final->is_walkover) {
-            return Player::find($final->walkover_winner_id);
+        // For round_robin format, champion is the top player when all games are complete
+        if ($this->tournament?->format === TournamentFormat::RoundRobin && $this->roundRobinComplete) {
+            $standings = $this->standings;
+            if (! empty($standings)) {
+                return $standings[0]['player'];
+            }
         }
 
-        if ($final->player1_sets > $final->player2_sets) {
-            return $final->player1;
-        }
-
-        return $final->player2;
+        return null;
     }
 
     #[Computed]

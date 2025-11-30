@@ -88,6 +88,7 @@ return [
     'championship_final' => 'Championship Final',
     'top_2_compete' => 'Top 2 players compete for the title',
     'tournament_champion' => 'Tournament Champion',
+    'round_robin_winner' => 'Round Robin Winner',
     'won_by_walkover' => 'Won by walkover',
     'defeated' => 'Defeated',
     'enter_final_result' => 'Enter Final Result',

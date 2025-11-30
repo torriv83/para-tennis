@@ -88,6 +88,7 @@ return [
     'championship_final' => 'Фінал чемпіонату',
     'top_2_compete' => 'Топ-2 гравці змагаються за титул',
     'tournament_champion' => 'Чемпіон турніру',
+    'round_robin_winner' => 'Переможець колового турніру',
     'won_by_walkover' => 'Переміг без боротьби',
     'defeated' => 'Переміг',
     'enter_final_result' => 'Ввести результат фіналу',
