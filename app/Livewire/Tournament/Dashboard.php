@@ -23,6 +23,8 @@ class Dashboard extends Component
 
     public string $tournamentFormat = 'round_robin';
 
+    public bool $hasDoubles = false;
+
     public string $newPlayerName = '';
 
     public string $activeTab = 'overview';
@@ -41,10 +43,28 @@ class Dashboard extends Component
 
     public string $editFormat = '';
 
+    public bool $editHasDoubles = false;
+
+    public bool $showDoublesForm = false;
+
+    public ?int $doublesTeam1Player1 = null;
+
+    public ?int $doublesTeam1Player2 = null;
+
+    public ?int $doublesTeam2Player1 = null;
+
+    public ?int $doublesTeam2Player2 = null;
+
     public function mount(?Tournament $tournament = null): void
     {
         if ($tournament?->id) {
-            $this->tournament = $tournament->load(['players', 'games.player1', 'games.player2']);
+            $this->tournament = $tournament->load([
+                'players',
+                'games.player1',
+                'games.player2',
+                'games.player1Partner',
+                'games.player2Partner',
+            ]);
         }
 
         $this->startDate = now()->format('Y-m-d');
@@ -58,6 +78,7 @@ class Dashboard extends Component
             'startDate' => 'required|date',
             'endDate' => 'required|date|after_or_equal:startDate',
             'tournamentFormat' => 'required|in:round_robin,round_robin_finals',
+            'hasDoubles' => 'boolean',
         ]);
 
         $tournament = Tournament::create([
@@ -65,6 +86,7 @@ class Dashboard extends Component
             'start_date' => $validated['startDate'],
             'end_date' => $validated['endDate'],
             'format' => $validated['tournamentFormat'],
+            'has_doubles' => $validated['hasDoubles'],
         ]);
 
         $this->redirect(route('home', $tournament), navigate: true);
@@ -118,7 +140,7 @@ class Dashboard extends Component
             }
         }
 
-        $this->tournament->load(['games.player1', 'games.player2']);
+        $this->tournament->load(['games.player1', 'games.player2', 'games.player1Partner', 'games.player2Partner']);
     }
 
     public function updateGameResult(int $gameId, int $p1Sets, int $p2Sets, int $p1Games, int $p2Games, ?array $setScores = null): void
@@ -147,7 +169,7 @@ class Dashboard extends Component
             'completed' => true,
         ]);
 
-        $this->tournament->load(['games.player1', 'games.player2']);
+        $this->tournament->load(['games.player1', 'games.player2', 'games.player1Partner', 'games.player2Partner']);
 
         // Auto-create final match when round-robin completes for round_robin_finals format
         if (! $game->is_final) {
@@ -181,7 +203,7 @@ class Dashboard extends Component
             'set_scores' => $swappedSetScores,
         ]);
 
-        $this->tournament->load(['games.player1', 'games.player2']);
+        $this->tournament->load(['games.player1', 'games.player2', 'games.player1Partner', 'games.player2Partner']);
     }
 
     public function deleteTournament(): void
@@ -196,6 +218,7 @@ class Dashboard extends Component
         $this->editStartDate = $this->tournament->start_date->format('Y-m-d');
         $this->editEndDate = $this->tournament->end_date?->format('Y-m-d') ?? '';
         $this->editFormat = $this->tournament->format->value;
+        $this->editHasDoubles = $this->tournament->has_doubles;
         $this->editingTournament = true;
     }
 
@@ -206,6 +229,7 @@ class Dashboard extends Component
             'editStartDate' => 'required|date',
             'editEndDate' => 'required|date|after_or_equal:editStartDate',
             'editFormat' => 'required|in:round_robin,round_robin_finals',
+            'editHasDoubles' => 'boolean',
         ]);
 
         $this->tournament->update([
@@ -213,6 +237,7 @@ class Dashboard extends Component
             'start_date' => $validated['editStartDate'],
             'end_date' => $validated['editEndDate'],
             'format' => $validated['editFormat'],
+            'has_doubles' => $validated['editHasDoubles'],
         ]);
 
         $this->editingTournament = false;
@@ -221,7 +246,7 @@ class Dashboard extends Component
     public function cancelEditingTournament(): void
     {
         $this->editingTournament = false;
-        $this->reset(['editName', 'editStartDate', 'editEndDate', 'editFormat']);
+        $this->reset(['editName', 'editStartDate', 'editEndDate', 'editFormat', 'editHasDoubles']);
     }
 
     public function newTournament(): void
@@ -266,7 +291,7 @@ class Dashboard extends Component
         }
 
         $this->reset('newPlayerName');
-        $this->tournament->load(['players', 'games.player1', 'games.player2']);
+        $this->tournament->load(['players', 'games.player1', 'games.player2', 'games.player1Partner', 'games.player2Partner']);
     }
 
     public function updateGameSchedule(int $gameId, ?string $scheduledAt): void
@@ -283,7 +308,7 @@ class Dashboard extends Component
             'scheduled_at' => $scheduledAt ?: null,
         ]);
 
-        $this->tournament->load(['games.player1', 'games.player2']);
+        $this->tournament->load(['games.player1', 'games.player2', 'games.player1Partner', 'games.player2Partner']);
     }
 
     public function recordWalkover(int $gameId, int $winnerId): void
@@ -311,7 +336,7 @@ class Dashboard extends Component
             'completed' => true,
         ]);
 
-        $this->tournament->load(['games.player1', 'games.player2']);
+        $this->tournament->load(['games.player1', 'games.player2', 'games.player1Partner', 'games.player2Partner']);
 
         // Auto-create final match when round-robin completes for round_robin_finals format
         if (! $game->is_final) {
@@ -335,7 +360,7 @@ class Dashboard extends Component
             'completed' => false,
         ]);
 
-        $this->tournament->load(['games.player1', 'games.player2']);
+        $this->tournament->load(['games.player1', 'games.player2', 'games.player1Partner', 'games.player2Partner']);
     }
 
     public function togglePlayersDrawer(): void
@@ -373,7 +398,66 @@ class Dashboard extends Component
         }
 
         $this->selectedPlayers = [];
-        $this->tournament->load(['players', 'games.player1', 'games.player2']);
+        $this->tournament->load([
+            'players',
+            'games.player1',
+            'games.player2',
+            'games.player1Partner',
+            'games.player2Partner',
+        ]);
+    }
+
+    public function createDoublesMatch(): void
+    {
+        if (! $this->tournament?->has_doubles) {
+            return;
+        }
+
+        $playerIds = [
+            $this->doublesTeam1Player1,
+            $this->doublesTeam1Player2,
+            $this->doublesTeam2Player1,
+            $this->doublesTeam2Player2,
+        ];
+
+        // Validate all players are selected and distinct
+        if (in_array(null, $playerIds, true) || count(array_unique($playerIds)) !== 4) {
+            return;
+        }
+
+        // Validate all players belong to this tournament
+        $validPlayers = $this->tournament->players()
+            ->whereIn('id', $playerIds)
+            ->count();
+
+        if ($validPlayers !== 4) {
+            return;
+        }
+
+        $this->tournament->games()->create([
+            'player1_id' => $this->doublesTeam1Player1,
+            'player1_partner_id' => $this->doublesTeam1Player2,
+            'player2_id' => $this->doublesTeam2Player1,
+            'player2_partner_id' => $this->doublesTeam2Player2,
+            'is_doubles' => true,
+        ]);
+
+        $this->resetDoublesForm();
+        $this->tournament->load([
+            'games.player1',
+            'games.player2',
+            'games.player1Partner',
+            'games.player2Partner',
+        ]);
+    }
+
+    public function resetDoublesForm(): void
+    {
+        $this->showDoublesForm = false;
+        $this->doublesTeam1Player1 = null;
+        $this->doublesTeam1Player2 = null;
+        $this->doublesTeam2Player1 = null;
+        $this->doublesTeam2Player2 = null;
     }
 
     public function maybeCreateFinalMatch(): void
@@ -388,8 +472,11 @@ class Dashboard extends Component
             return;
         }
 
-        // Check if all round-robin games are completed
-        $roundRobinGames = $this->tournament->games->where('is_final', false);
+        // Check if all round-robin games are completed (excluding doubles)
+        $roundRobinGames = $this->tournament->games
+            ->where('is_final', false)
+            ->where('is_doubles', false);
+
         if ($roundRobinGames->isEmpty()) {
             return;
         }
@@ -416,7 +503,7 @@ class Dashboard extends Component
             'is_final' => true,
         ]);
 
-        $this->tournament->load(['games.player1', 'games.player2']);
+        $this->tournament->load(['games.player1', 'games.player2', 'games.player1Partner', 'games.player2Partner']);
     }
 
     #[Computed]
@@ -430,13 +517,26 @@ class Dashboard extends Component
     }
 
     #[Computed]
+    public function doublesMatch(): ?Game
+    {
+        if (! $this->tournament || ! $this->tournament->has_doubles) {
+            return null;
+        }
+
+        return $this->tournament->games->where('is_doubles', true)->first();
+    }
+
+    #[Computed]
     public function roundRobinComplete(): bool
     {
         if (! $this->tournament) {
             return false;
         }
 
-        $roundRobinGames = $this->tournament->games->where('is_final', false);
+        $roundRobinGames = $this->tournament->games
+            ->where('is_final', false)
+            ->where('is_doubles', false);
+
         if ($roundRobinGames->isEmpty()) {
             return false;
         }

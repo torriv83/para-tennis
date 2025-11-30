@@ -14,7 +14,9 @@ class Game extends Model
     protected $fillable = [
         'tournament_id',
         'player1_id',
+        'player1_partner_id',
         'player2_id',
+        'player2_partner_id',
         'scheduled_at',
         'player1_sets',
         'player2_sets',
@@ -22,6 +24,7 @@ class Game extends Model
         'player2_games',
         'set_scores',
         'is_final',
+        'is_doubles',
         'completed',
         'is_walkover',
         'walkover_winner_id',
@@ -32,6 +35,7 @@ class Game extends Model
         return [
             'scheduled_at' => 'datetime',
             'is_final' => 'boolean',
+            'is_doubles' => 'boolean',
             'completed' => 'boolean',
             'is_walkover' => 'boolean',
             'set_scores' => 'array',
@@ -56,6 +60,34 @@ class Game extends Model
     public function walkoverWinner(): BelongsTo
     {
         return $this->belongsTo(Player::class, 'walkover_winner_id');
+    }
+
+    public function player1Partner(): BelongsTo
+    {
+        return $this->belongsTo(Player::class, 'player1_partner_id');
+    }
+
+    public function player2Partner(): BelongsTo
+    {
+        return $this->belongsTo(Player::class, 'player2_partner_id');
+    }
+
+    public function team1Names(): string
+    {
+        if (! $this->is_doubles) {
+            return $this->player1?->name ?? '';
+        }
+
+        return $this->player1?->name.' & '.$this->player1Partner?->name;
+    }
+
+    public function team2Names(): string
+    {
+        if (! $this->is_doubles) {
+            return $this->player2?->name ?? '';
+        }
+
+        return $this->player2?->name.' & '.$this->player2Partner?->name;
     }
 
     public function winner(): ?Player

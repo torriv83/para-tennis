@@ -95,6 +95,19 @@ return [
     'round_robin_complete_notice' => 'Round robin complete! Final match will be created...',
     'complete_round_robin' => 'Complete all round robin matches to unlock the final',
 
+    // Doubles
+    'include_doubles' => 'Include Doubles',
+    'include_doubles_desc' => 'Add a doubles final match to this tournament',
+    'doubles_final' => 'Doubles Final',
+    'doubles_final_desc' => '2v2 team match',
+    'create_doubles_final' => 'Create Doubles Final',
+    'team_1' => 'Team 1',
+    'team_2' => 'Team 2',
+    'select_player' => 'Select player',
+    'select_winning_team' => 'Select winning team:',
+    'need_4_players' => 'Add at least 4 players to create a doubles match',
+    'create' => 'Create',
+
     // Schedule
     'ready_to_start' => 'Ready to start the tournament?',
     'generate_match_schedule' => 'Generate Match Schedule',

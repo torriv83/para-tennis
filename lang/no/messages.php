@@ -95,6 +95,19 @@ return [
     'round_robin_complete_notice' => 'Round robin fullført! Finalekamp blir opprettet...',
     'complete_round_robin' => 'Fullfør alle round robin-kamper for å låse opp finalen',
 
+    // Doubles
+    'include_doubles' => 'Inkluder double',
+    'include_doubles_desc' => 'Legg til en doublefinale i denne turneringen',
+    'doubles_final' => 'Doublefinale',
+    'doubles_final_desc' => '2v2 lagkamp',
+    'create_doubles_final' => 'Opprett doublefinale',
+    'team_1' => 'Lag 1',
+    'team_2' => 'Lag 2',
+    'select_player' => 'Velg spiller',
+    'select_winning_team' => 'Velg vinnende lag:',
+    'need_4_players' => 'Legg til minst 4 spillere for å opprette en doublekamp',
+    'create' => 'Opprett',
+
     // Schedule
     'ready_to_start' => 'Klar til å starte turneringen?',
     'generate_match_schedule' => 'Generer kampplan',

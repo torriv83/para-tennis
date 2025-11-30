@@ -19,6 +19,7 @@ class Tournament extends Model
         'start_date',
         'end_date',
         'format',
+        'has_doubles',
     ];
 
     protected static function booted(): void
@@ -58,6 +59,7 @@ class Tournament extends Model
             'start_date' => 'date',
             'end_date' => 'date',
             'format' => TournamentFormat::class,
+            'has_doubles' => 'boolean',
         ];
     }
 

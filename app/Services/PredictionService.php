@@ -19,7 +19,8 @@ class PredictionService
     {
         $incompleteGames = $this->tournament->games
             ->where('completed', false)
-            ->where('is_final', false);
+            ->where('is_final', false)
+            ->where('is_doubles', false);
 
         if ($incompleteGames->isEmpty()) {
             return $this->getFinalStandingsPredictions();
@@ -229,6 +230,7 @@ class PredictionService
         $completedGames = $this->tournament->games
             ->where('completed', true)
             ->where('is_final', false)
+            ->where('is_doubles', false)
             ->map(fn ($g) => [
                 'player1_id' => $g->player1_id,
                 'player2_id' => $g->player2_id,
@@ -314,7 +316,8 @@ class PredictionService
 
         $incompleteGames = $this->tournament->games
             ->where('completed', false)
-            ->where('is_final', false);
+            ->where('is_final', false)
+            ->where('is_doubles', false);
 
         $playerGames = $incompleteGames->filter(
             fn ($g) => $g->player1_id === $player->id || $g->player2_id === $player->id

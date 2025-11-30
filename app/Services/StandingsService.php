@@ -76,7 +76,8 @@ class StandingsService
     {
         $games = $this->tournament->games
             ->where('completed', true)
-            ->where('is_final', false);
+            ->where('is_final', false)
+            ->where('is_doubles', false);
 
         foreach ($games as $game) {
             $p1Id = $game->player1_id;
