@@ -1,0 +1,43 @@
+@import 'tailwindcss';
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* Fix date/time input icons for dark mode */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    /* Typography */
+    --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+
+    /* Core Colors */
+    --color-background: #05070B;
+    --color-surface: #0D0F14;
+    --color-surface-light: #1A1D24;
+
+    /* Accent Colors */
+    --color-primary: #FF793F;
+    --color-primary-hover: #FF8F5A;
+    --color-secondary: #C387FF;
+
+    /* Semantic Colors */
+    --color-success: #4ADE80;
+    --color-danger: #F87171;
+    --color-muted: #6B7280;
+
+    /* Text Colors */
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #A1A1AA;
+    --color-text-muted: #6B7280;
+}
