@@ -23,8 +23,13 @@ Para Tennis Tournament Management System - a personal tool for managing tourname
 
 ## Standings & Tiebreakers
 
+Point system:
+- **Win = 2 points**
+- **Loss = 0 points**
+- **Walkover win = 2 points**
+
 Rankings determined in order:
-1. **Points** (match wins)
+1. **Points** (2 per win)
 2. **Set difference** (sets won minus sets lost)
 3. **Game difference** (games won minus games lost)
 

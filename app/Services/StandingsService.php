@@ -42,6 +42,7 @@ class StandingsService
                 'played' => 0,
                 'wins' => 0,
                 'losses' => 0,
+                'points' => 0,
                 'sets_won' => 0,
                 'sets_lost' => 0,
                 'games_won' => 0,
@@ -62,6 +63,7 @@ class StandingsService
                 'player_name' => $player->name,
                 'wins' => 0,
                 'losses' => 0,
+                'points' => 0,
                 'sets_won' => 0,
                 'sets_lost' => 0,
                 'games_won' => 0,
@@ -85,6 +87,7 @@ class StandingsService
 
             if ($game->is_walkover) {
                 $standings[$game->walkover_winner_id]['wins']++;
+                $standings[$game->walkover_winner_id]['points'] += 2;
 
                 continue;
             }
@@ -104,9 +107,11 @@ class StandingsService
 
             if ($game->player1_sets > $game->player2_sets) {
                 $standings[$p1Id]['wins']++;
+                $standings[$p1Id]['points'] += 2;
                 $standings[$p2Id]['losses']++;
             } else {
                 $standings[$p2Id]['wins']++;
+                $standings[$p2Id]['points'] += 2;
                 $standings[$p1Id]['losses']++;
             }
         }
@@ -123,6 +128,7 @@ class StandingsService
 
         if (! empty($game['is_walkover']) && ! empty($game['walkover_winner_id'])) {
             $standings[$game['walkover_winner_id']]['wins']++;
+            $standings[$game['walkover_winner_id']]['points'] += 2;
 
             return;
         }
@@ -139,9 +145,11 @@ class StandingsService
 
         if ($game['player1_sets'] > $game['player2_sets']) {
             $standings[$p1Id]['wins']++;
+            $standings[$p1Id]['points'] += 2;
             $standings[$p2Id]['losses']++;
         } else {
             $standings[$p2Id]['wins']++;
+            $standings[$p2Id]['points'] += 2;
             $standings[$p1Id]['losses']++;
         }
     }
@@ -149,8 +157,9 @@ class StandingsService
     protected function sortStandings(array &$standings): void
     {
         usort($standings, function ($a, $b) {
-            if ($a['wins'] !== $b['wins']) {
-                return $b['wins'] - $a['wins'];
+            // Sort by points first
+            if ($a['points'] !== $b['points']) {
+                return $b['points'] - $a['points'];
             }
 
             $aSetDiff = $a['sets_won'] - $a['sets_lost'];

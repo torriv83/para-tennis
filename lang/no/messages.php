@@ -54,7 +54,7 @@ return [
     'wins_full' => 'Seire',
     'losses_abbr' => 'T',
     'losses_full' => 'Tap',
-    'points_abbr' => 'P',
+    'points_abbr' => 'Pts',
     'points_full' => 'Poeng',
     'sets_abbr' => 'Sett',
     'sets_full' => 'Sett (vunnet-tapt)',

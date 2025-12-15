@@ -16,13 +16,13 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-background font-sans text-text-primary antialiased">
-    <div class="mx-auto max-w-6xl px-6 py-8">
-        <header class="mb-12 flex items-start justify-between">
-            <div>
-                <h1 class="text-4xl font-semibold">{{ __('messages.app_name') }}</h1>
-                <p class="mt-2 text-text-secondary">{{ __('messages.tournament_management') }}</p>
+    <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        <header class="mb-8 sm:mb-12">
+            <div class="mb-2 flex items-center justify-between gap-4">
+                <h1 class="min-w-0 truncate text-2xl font-semibold sm:text-3xl md:text-4xl">{{ __('messages.app_name') }}</h1>
+                <livewire:language-switcher />
             </div>
-            <livewire:language-switcher />
+            <p class="text-sm text-text-secondary sm:text-base">{{ __('messages.tournament_management') }}</p>
         </header>
 
         <main>

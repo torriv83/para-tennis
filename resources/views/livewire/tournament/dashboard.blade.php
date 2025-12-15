@@ -1,7 +1,7 @@
 <div class="space-y-8">
     @if(!$tournament)
         {{-- Hero Section --}}
-        <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-surface via-surface to-surface-light p-8 md:p-12">
+        <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-surface via-surface to-surface-light p-5 sm:p-8 md:p-12">
             {{-- Decorative elements --}}
             <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl"></div>
             <div class="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-primary/5 blur-3xl"></div>
@@ -14,8 +14,8 @@
                     {{ __('messages.new_tournament') }}
                 </div>
 
-                <h2 class="mb-3 text-3xl font-semibold md:text-4xl">{{ __('messages.create_your_tournament') }}</h2>
-                <p class="mb-8 max-w-xl text-text-secondary">
+                <h2 class="mb-3 text-2xl font-semibold sm:text-3xl md:text-4xl">{{ __('messages.create_your_tournament') }}</h2>
+                <p class="mb-6 max-w-xl text-sm text-text-secondary sm:mb-8 sm:text-base">
                     {{ __('messages.create_tournament_description') }}
                 </p>
 
@@ -36,7 +36,7 @@
                     {{-- Date Range --}}
                     <div>
                         <label class="mb-2 block text-sm font-medium text-text-secondary">{{ __('messages.tournament_dates') }}</label>
-                        <div class="flex items-center gap-3">
+                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                             <div class="flex-1">
                                 <input
                                     type="date"
@@ -44,7 +44,7 @@
                                     class="w-full cursor-pointer rounded-lg border border-white/10 bg-background/50 px-4 py-3 text-text-primary backdrop-blur-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 >
                             </div>
-                            <span class="text-text-muted">{{ __('messages.to') }}</span>
+                            <span class="hidden text-text-muted sm:block">{{ __('messages.to') }}</span>
                             <div class="flex-1">
                                 <input
                                     type="date"
@@ -123,18 +123,18 @@
 
         {{-- Tournament History --}}
         @if($this->allTournaments->count() > 0)
-            <div class="rounded-xl border border-white/10 bg-surface p-6">
+            <div class="rounded-xl border border-white/10 bg-surface p-4 sm:p-6">
                 <h3 class="mb-4 text-lg font-medium">{{ __('messages.previous_tournaments') }}</h3>
                 <div class="space-y-2">
                     @foreach($this->allTournaments as $t)
                         <button
                             wire:key="history-{{ $t->id }}"
                             wire:click="selectTournament({{ $t->id }})"
-                            class="flex w-full cursor-pointer items-center justify-between rounded-lg border border-white/5 bg-surface-light px-4 py-3 text-left transition hover:border-white/20"
+                            class="flex w-full cursor-pointer flex-col gap-1 rounded-lg border border-white/5 bg-surface-light px-4 py-3 text-left transition hover:border-white/20 sm:flex-row sm:items-center sm:justify-between sm:gap-2"
                         >
-                            <div>
+                            <div class="min-w-0 flex-1">
                                 <span class="font-medium">{{ $t->name }}</span>
-                                <span class="ml-2 text-sm text-text-muted">
+                                <span class="mt-1 block text-sm text-text-muted sm:ml-2 sm:mt-0 sm:inline">
                                     {{ localized_date_range($t->start_date, $t->end_date) }}
                                 </span>
                             </div>
@@ -148,30 +148,30 @@
         @endif
     @else
         {{-- Navigation Bar --}}
-        <div class="flex items-center justify-between rounded-xl border border-white/10 bg-surface px-4 py-3">
-            <div class="flex items-center gap-4">
+        <div class="flex items-center justify-between rounded-xl border border-white/10 bg-surface px-2 py-2 sm:px-4 sm:py-3">
+            <div class="flex min-w-0 items-center gap-2 sm:gap-4">
                 {{-- Back Button --}}
                 <button
                     wire:click="newTournament"
-                    class="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-text-secondary transition hover:bg-surface-light hover:text-text-primary"
+                    class="flex shrink-0 cursor-pointer items-center gap-2 rounded-lg p-2 text-text-secondary transition hover:bg-surface-light hover:text-text-primary sm:px-3"
                 >
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
-                    <span class="text-sm font-medium">{{ __('messages.all_tournaments') }}</span>
+                    <span class="hidden text-sm font-medium sm:inline">{{ __('messages.all_tournaments') }}</span>
                 </button>
 
                 {{-- Divider --}}
-                <div class="h-6 w-px bg-white/10"></div>
+                <div class="hidden h-6 w-px bg-white/10 sm:block"></div>
 
                 {{-- Tournament Switcher --}}
-                <div x-data="{ open: false }" class="relative">
+                <div x-data="{ open: false }" class="relative min-w-0">
                     <button
                         @click="open = !open"
-                        class="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 transition hover:bg-surface-light"
+                        class="flex cursor-pointer items-center gap-1 rounded-lg px-2 py-2 transition hover:bg-surface-light sm:gap-2 sm:px-3"
                     >
-                        <span class="font-medium">{{ $tournament->name }}</span>
-                        <svg class="h-4 w-4 text-text-muted transition" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <span class="truncate text-sm font-medium sm:text-base">{{ $tournament->name }}</span>
+                        <svg class="h-4 w-4 shrink-0 text-text-muted transition" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
                     </button>
@@ -270,34 +270,56 @@
         </div>
 
         {{-- Tournament Info Header --}}
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="text-2xl font-semibold">{{ $tournament->name }}</h2>
-                <div class="mt-1 flex items-center gap-3 text-sm text-text-secondary">
-                    <span class="flex items-center gap-1">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                    <h2 class="min-w-0 truncate text-xl font-semibold sm:text-2xl">{{ $tournament->name }}</h2>
+                    {{-- Manage Players button - mobile only, next to title --}}
+                    <button
+                        wire:click="togglePlayersDrawer"
+                        class="flex shrink-0 cursor-pointer items-center rounded-lg border border-white/10 bg-surface-light p-2 text-sm font-medium transition hover:border-white/20 sm:hidden"
+                    >
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-secondary sm:text-sm">
+                    <span class="flex items-center gap-1">
+                        <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         {{ localized_date_range($tournament->start_date, $tournament->end_date) }}
                     </span>
-                    <span class="h-1 w-1 rounded-full bg-text-muted"></span>
+                    <span class="hidden h-1 w-1 rounded-full bg-text-muted sm:block"></span>
                     <span>{{ $tournament->format->label() }}</span>
                 </div>
             </div>
 
             {{-- Quick Stats + Manage Players --}}
-            <div class="flex items-center gap-6">
-                <div class="text-center">
-                    <div class="text-2xl font-semibold">{{ $tournament->players->count() }}</div>
-                    <div class="text-xs text-text-muted">{{ __('messages.players') }}</div>
+            <div class="flex items-center gap-3 sm:gap-6">
+                {{-- Players stat --}}
+                <div class="flex items-center gap-1.5 sm:flex-col sm:gap-0 sm:text-center">
+                    <svg class="h-4 w-4 text-text-muted sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <div class="text-lg font-semibold sm:text-2xl">{{ $tournament->players->count() }}</div>
+                    <div class="hidden text-xs text-text-muted sm:block">{{ __('messages.players') }}</div>
                 </div>
-                <div class="text-center">
-                    <div class="text-2xl font-semibold">{{ $tournament->games->where('completed', true)->count() }}/{{ $tournament->games->count() }}</div>
-                    <div class="text-xs text-text-muted">{{ __('messages.matches') }}</div>
+                {{-- Matches stat --}}
+                <div class="flex items-center gap-1.5 sm:flex-col sm:gap-0 sm:text-center">
+                    <svg class="h-4 w-4 text-text-muted sm:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M18.5 5.5c-3 2-5 5-5 6.5s2 4.5 5 6.5" stroke-linecap="round" />
+                        <path d="M5.5 5.5c3 2 5 5 5 6.5s-2 4.5-5 6.5" stroke-linecap="round" />
+                    </svg>
+                    <div class="text-lg font-semibold sm:text-2xl">{{ $tournament->games->where('completed', true)->count() }}/{{ $tournament->games->count() }}</div>
+                    <div class="hidden text-xs text-text-muted sm:block">{{ __('messages.matches') }}</div>
                 </div>
+                {{-- Manage Players button - desktop only --}}
                 <button
                     wire:click="togglePlayersDrawer"
-                    class="flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-surface-light px-4 py-2 text-sm font-medium transition hover:border-white/20"
+                    class="hidden cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-surface-light px-4 py-2 text-sm font-medium transition hover:border-white/20 sm:flex"
                 >
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -329,7 +351,7 @@
 
             {{-- Next Up Widget --}}
             @if($this->nextUp['type'] !== 'none')
-                <div class="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 to-transparent p-4">
+                <div class="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 to-transparent p-3 sm:p-4">
                     <div class="mb-3 flex items-center gap-2">
                         @if($this->nextUp['type'] === 'today')
                             <svg class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -340,21 +362,21 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                         @endif
-                        <h3 class="font-medium {{ $this->nextUp['type'] === 'today' ? 'text-primary' : 'text-secondary' }}">{{ $this->nextUp['type'] === 'today' ? __('messages.playing_today') : __('messages.next_match') }}</h3>
+                        <h3 class="text-sm font-medium sm:text-base {{ $this->nextUp['type'] === 'today' ? 'text-primary' : 'text-secondary' }}">{{ $this->nextUp['type'] === 'today' ? __('messages.playing_today') : __('messages.next_match') }}</h3>
                     </div>
                     <div class="space-y-2">
                         @foreach($this->nextUp['games'] as $game)
-                            <div wire:key="nextup-{{ $game->id }}" class="flex items-center justify-between rounded-lg bg-surface/50 p-3">
-                                <div class="flex items-center gap-3">
+                            <div wire:key="nextup-{{ $game->id }}" class="flex flex-col gap-2 rounded-lg bg-surface/50 p-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm sm:text-base">
                                     <span class="font-medium">{{ $game->player1->name }}</span>
                                     <span class="text-text-muted">{{ __('messages.vs') }}</span>
                                     <span class="font-medium">{{ $game->player2->name }}</span>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="text-sm text-text-muted">{{ localized_date($game->scheduled_at, 'time') }}</span>
+                                    <span class="text-xs text-text-muted sm:text-sm">{{ localized_date($game->scheduled_at, 'time') }}</span>
                                     <button
                                         wire:click="$set('activeTab', 'matches')"
-                                        class="cursor-pointer rounded-md bg-primary px-3 py-1 text-sm font-medium text-white transition hover:bg-primary-hover"
+                                        class="cursor-pointer rounded-md bg-primary px-3 py-1 text-xs font-medium text-white transition hover:bg-primary-hover sm:text-sm"
                                     >
                                         {{ __('messages.enter_result') }}
                                     </button>
@@ -367,47 +389,53 @@
 
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
                 {{-- Standings Section --}}
-                <div class="rounded-xl border border-white/10 bg-surface p-6">
+                <div class="rounded-xl border border-white/10 bg-surface p-4 sm:p-6">
                     <h3 class="mb-4 text-lg font-medium">{{ __('messages.standings') }}</h3>
 
                     @if(count($this->standings) > 0)
-                        <div class="overflow-x-auto">
-                            <table class="w-full">
+                        <div class="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+                            <table class="w-full text-sm sm:text-base">
                                 <thead>
-                                    <tr class="border-b border-white/10 text-left text-xs uppercase tracking-wide text-text-muted">
-                                        <th class="pb-3 pr-4">#</th>
-                                        <th class="pb-3 pr-4">{{ __('messages.player') }}</th>
-                                        <th class="cursor-help pb-3 pr-4 text-center" title="{{ __('messages.played_full') }}">{{ __('messages.played_abbr') }}</th>
-                                        <th class="cursor-help pb-3 pr-4 text-center" title="{{ __('messages.wins_full') }}">{{ __('messages.wins_abbr') }}</th>
-                                        <th class="cursor-help pb-3 pr-4 text-center" title="{{ __('messages.losses_full') }}">{{ __('messages.losses_abbr') }}</th>
-                                        <th class="cursor-help pb-3 pr-4 text-center" title="{{ __('messages.points_full') }}">{{ __('messages.points_abbr') }}</th>
-                                        <th class="cursor-help pb-3 pr-4 text-center" title="{{ __('messages.sets_full') }}">{{ __('messages.sets_abbr') }}</th>
-                                        <th class="cursor-help pb-3 text-center" title="{{ __('messages.games_full') }}">{{ __('messages.games_abbr') }}</th>
+                                    <tr class="border-b border-white/10 text-left text-[10px] uppercase tracking-wide text-text-muted sm:text-xs">
+                                        <th class="pb-2 pr-1 sm:pb-3 sm:pr-3">#</th>
+                                        <th class="pb-2 pr-2 sm:pb-3 sm:pr-4">{{ __('messages.player') }}</th>
+                                        <th class="hidden cursor-help pb-3 pr-4 text-center sm:table-cell" title="{{ __('messages.played_full') }}">{{ __('messages.played_abbr') }}</th>
+                                        <th class="hidden cursor-help pb-3 pr-4 text-center sm:table-cell" title="{{ __('messages.wins_full') }}">{{ __('messages.wins_abbr') }}</th>
+                                        <th class="hidden cursor-help pb-3 pr-4 text-center sm:table-cell" title="{{ __('messages.losses_full') }}">{{ __('messages.losses_abbr') }}</th>
+                                        <th class="cursor-help pb-2 pr-2 text-center sm:pb-3 sm:pr-4" title="{{ __('messages.points_full') }}">{{ __('messages.points_abbr') }}</th>
+                                        <th class="cursor-help pb-2 pr-2 text-center sm:pb-3 sm:pr-4" title="{{ __('messages.sets_full') }}">{{ __('messages.sets_abbr') }}</th>
+                                        <th class="cursor-help pb-2 text-center sm:pb-3" title="{{ __('messages.games_full') }}">{{ __('messages.games_abbr') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($this->standings as $index => $standing)
+                                        @php
+                                            $setDiff = $standing['sets_won'] - $standing['sets_lost'];
+                                            $gameDiff = $standing['games_won'] - $standing['games_lost'];
+                                        @endphp
                                         <tr wire:key="standing-{{ $standing['player']->id }}" class="border-b border-white/5">
-                                            <td class="py-3 pr-4 font-medium text-text-secondary">{{ $index + 1 }}</td>
-                                            <td class="py-3 pr-4 font-medium">{{ $standing['player']->name }}</td>
-                                            <td class="py-3 pr-4 text-center text-text-secondary">{{ $standing['played'] }}</td>
-                                            <td class="py-3 pr-4 text-center text-success">{{ $standing['wins'] }}</td>
-                                            <td class="py-3 pr-4 text-center text-danger">{{ $standing['losses'] }}</td>
-                                            <td class="py-3 pr-4 text-center font-semibold text-amber-400">{{ $standing['wins'] }}</td>
-                                            @php
-                                                $setDiff = $standing['sets_won'] - $standing['sets_lost'];
-                                                $gameDiff = $standing['games_won'] - $standing['games_lost'];
-                                            @endphp
-                                            <td class="py-3 pr-4 text-center text-text-secondary">
-                                                {{ $standing['sets_won'] }}-{{ $standing['sets_lost'] }}
-                                                <span class="ml-1 text-xs {{ $setDiff > 0 ? 'text-success' : ($setDiff < 0 ? 'text-danger' : 'text-text-muted') }}">
-                                                    ({{ $setDiff > 0 ? '+' : '' }}{{ $setDiff }})
+                                            <td class="py-2 pr-1 text-xs text-text-secondary sm:py-3 sm:pr-3 sm:text-sm">{{ $index + 1 }}</td>
+                                            <td class="max-w-[90px] truncate py-2 pr-2 text-xs font-medium sm:max-w-none sm:py-3 sm:pr-4 sm:text-sm">{{ $standing['player']->name }}</td>
+                                            <td class="hidden py-3 pr-4 text-center text-text-secondary sm:table-cell">{{ $standing['played'] }}</td>
+                                            <td class="hidden py-3 pr-4 text-center text-success sm:table-cell">{{ $standing['wins'] }}</td>
+                                            <td class="hidden py-3 pr-4 text-center text-danger sm:table-cell">{{ $standing['losses'] }}</td>
+                                            <td class="py-2 pr-2 text-center text-xs font-bold text-primary sm:py-3 sm:pr-4 sm:text-sm sm:font-semibold sm:text-amber-400">{{ $standing['points'] }}</td>
+                                            <td class="whitespace-nowrap py-2 pr-2 text-center sm:py-3 sm:pr-4">
+                                                <span class="text-xs {{ $setDiff > 0 ? 'text-success' : ($setDiff < 0 ? 'text-danger' : 'text-text-secondary') }} sm:hidden">{{ $setDiff > 0 ? '+' : '' }}{{ $setDiff }}</span>
+                                                <span class="hidden text-text-secondary sm:inline">
+                                                    {{ $standing['sets_won'] }}-{{ $standing['sets_lost'] }}
+                                                    <span class="ml-1 text-xs {{ $setDiff > 0 ? 'text-success' : ($setDiff < 0 ? 'text-danger' : 'text-text-muted') }}">
+                                                        ({{ $setDiff > 0 ? '+' : '' }}{{ $setDiff }})
+                                                    </span>
                                                 </span>
                                             </td>
-                                            <td class="py-3 text-center text-text-secondary">
-                                                {{ $standing['games_won'] }}-{{ $standing['games_lost'] }}
-                                                <span class="ml-1 text-xs {{ $gameDiff > 0 ? 'text-success' : ($gameDiff < 0 ? 'text-danger' : 'text-text-muted') }}">
-                                                    ({{ $gameDiff > 0 ? '+' : '' }}{{ $gameDiff }})
+                                            <td class="whitespace-nowrap py-2 text-center sm:py-3">
+                                                <span class="text-xs {{ $gameDiff > 0 ? 'text-success' : ($gameDiff < 0 ? 'text-danger' : 'text-text-secondary') }} sm:hidden">{{ $gameDiff > 0 ? '+' : '' }}{{ $gameDiff }}</span>
+                                                <span class="hidden text-text-secondary sm:inline">
+                                                    {{ $standing['games_won'] }}-{{ $standing['games_lost'] }}
+                                                    <span class="ml-1 text-xs {{ $gameDiff > 0 ? 'text-success' : ($gameDiff < 0 ? 'text-danger' : 'text-text-muted') }}">
+                                                        ({{ $gameDiff > 0 ? '+' : '' }}{{ $gameDiff }})
+                                                    </span>
                                                 </span>
                                             </td>
                                         </tr>
@@ -421,16 +449,27 @@
                 </div>
 
                 {{-- Predictions Section --}}
-                <div class="rounded-xl border border-white/10 bg-surface p-6">
-                    <div class="mb-4 flex items-center gap-2">
-                        <svg class="h-5 w-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                <div class="rounded-xl border border-white/10 bg-surface p-4 sm:p-6" x-data="{ open: window.innerWidth >= 640 }">
+                    {{-- Mobile: Collapsible header --}}
+                    <button
+                        @click="open = !open"
+                        class="flex w-full cursor-pointer items-center justify-between gap-2 sm:cursor-default"
+                    >
+                        <div class="flex items-center gap-2">
+                            <svg class="h-5 w-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                            <h3 class="text-lg font-medium">{{ __('messages.predictions') }}</h3>
+                        </div>
+                        {{-- Arrow only visible on mobile --}}
+                        <svg class="h-5 w-5 text-text-muted transition-transform duration-200 sm:hidden" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
-                        <h3 class="text-lg font-medium">{{ __('messages.predictions') }}</h3>
-                    </div>
+                    </button>
 
-                    @if(count($this->predictions) > 0)
-                        <div class="space-y-3">
+                    <div x-show="open" x-collapse x-cloak class="sm:!block">
+                        @if(count($this->predictions) > 0)
+                            <div class="mt-4 space-y-3">
                             @php
                                 // Sort predictions by best_position (ascending), then worst_position as tiebreaker
                                 $sortedPredictions = collect($this->predictions)
@@ -498,10 +537,11 @@
                                     </div>
                                 @endif
                             @endforeach
-                        </div>
-                    @else
-                        <p class="text-text-muted">{{ __('messages.predictions_available_after') }}</p>
-                    @endif
+                            </div>
+                        @else
+                            <p class="mt-4 text-text-muted">{{ __('messages.predictions_available_after') }}</p>
+                        @endif
+                    </div>
                 </div>
             </div>
 
@@ -773,77 +813,87 @@
 
             {{-- Doubles Final Section --}}
             @if($tournament->has_doubles)
-                <div class="rounded-xl border border-white/10 bg-surface p-6">
-                    <div class="mb-4 flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20">
-                            <svg class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
+                <div class="rounded-xl border border-white/10 bg-surface p-6" x-data="{
+                    set1P1: 0, set1P2: 0,
+                    set2P1: 0, set2P2: 0,
+                    set3P1: 0, set3P2: 0,
+                    showSet3: false,
+                    editing: false,
+                    get set1Winner() {
+                        const p1 = this.set1P1, p2 = this.set1P2;
+                        if (p1 >= 6 && (p1 - p2 >= 2 || p1 === 7)) return 1;
+                        if (p2 >= 6 && (p2 - p1 >= 2 || p2 === 7)) return 2;
+                        return 0;
+                    },
+                    get set2Winner() {
+                        const p1 = this.set2P1, p2 = this.set2P2;
+                        if (p1 >= 6 && (p1 - p2 >= 2 || p1 === 7)) return 1;
+                        if (p2 >= 6 && (p2 - p1 >= 2 || p2 === 7)) return 2;
+                        return 0;
+                    },
+                    get needsSet3() {
+                        return this.set1Winner !== 0 && this.set2Winner !== 0 && this.set1Winner !== this.set2Winner;
+                    },
+                    get p1Sets() {
+                        let sets = 0;
+                        if (this.set1Winner === 1) sets++;
+                        if (this.set2Winner === 1) sets++;
+                        if (this.showSet3 && this.set3P1 > this.set3P2) sets++;
+                        return sets;
+                    },
+                    get p2Sets() {
+                        let sets = 0;
+                        if (this.set1Winner === 2) sets++;
+                        if (this.set2Winner === 2) sets++;
+                        if (this.showSet3 && this.set3P2 > this.set3P1) sets++;
+                        return sets;
+                    },
+                    get p1Games() {
+                        return this.set1P1 + this.set2P1 + (this.showSet3 ? this.set3P1 : 0);
+                    },
+                    get p2Games() {
+                        return this.set1P2 + this.set2P2 + (this.showSet3 ? this.set3P2 : 0);
+                    },
+                    get canSave() {
+                        return this.p1Sets === 2 || this.p2Sets === 2;
+                    }
+                }" x-effect="showSet3 = needsSet3">
+                    {{-- Header with title and edit button --}}
+                    <div class="mb-4 flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20">
+                                <svg class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold">{{ __('messages.doubles_final') }}</h3>
+                                <p class="text-sm text-text-muted">{{ __('messages.doubles_final_desc') }}</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="text-lg font-semibold">{{ __('messages.doubles_final') }}</h3>
-                            <p class="text-sm text-text-muted">{{ __('messages.doubles_final_desc') }}</p>
-                        </div>
+                        {{-- Edit button - only show when match exists, completed, and not walkover --}}
+                        @if($this->doublesMatch && $this->doublesMatch->completed && !$this->doublesMatch->is_walkover)
+                            <button x-show="!editing" @click="editing = true" class="cursor-pointer text-text-muted transition hover:text-primary" title="Edit result">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                            </button>
+                        @endif
                     </div>
 
                     @if($this->doublesMatch)
                         @php $doubles = $this->doublesMatch; @endphp
                         {{-- Doubles Match Card --}}
                         <div class="rounded-lg border border-white/10 bg-surface-light p-4">
-                            <div class="flex items-center justify-between">
-                                <div class="flex flex-1 items-center gap-3">
-                                    <div class="text-center">
-                                        <div class="font-semibold {{ $doubles->completed && $doubles->player1_sets > $doubles->player2_sets ? 'text-success' : '' }}">
-                                            {{ $doubles->team1Names() }}
-                                        </div>
+                            <div class="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+                                {{-- Team 1 --}}
+                                <div class="w-full text-center sm:flex-1 sm:text-left">
+                                    <div class="text-sm font-semibold sm:text-base {{ $doubles->completed && $doubles->player1_sets > $doubles->player2_sets ? 'text-success' : '' }}">
+                                        {{ $doubles->team1Names() }}
                                     </div>
                                 </div>
 
-                                <div class="flex items-center gap-3" x-data="{
-                                    set1P1: 0, set1P2: 0,
-                                    set2P1: 0, set2P2: 0,
-                                    set3P1: 0, set3P2: 0,
-                                    showSet3: false,
-                                    editing: false,
-                                    get set1Winner() {
-                                        const p1 = this.set1P1, p2 = this.set1P2;
-                                        if (p1 >= 6 && (p1 - p2 >= 2 || p1 === 7)) return 1;
-                                        if (p2 >= 6 && (p2 - p1 >= 2 || p2 === 7)) return 2;
-                                        return 0;
-                                    },
-                                    get set2Winner() {
-                                        const p1 = this.set2P1, p2 = this.set2P2;
-                                        if (p1 >= 6 && (p1 - p2 >= 2 || p1 === 7)) return 1;
-                                        if (p2 >= 6 && (p2 - p1 >= 2 || p2 === 7)) return 2;
-                                        return 0;
-                                    },
-                                    get needsSet3() {
-                                        return this.set1Winner !== 0 && this.set2Winner !== 0 && this.set1Winner !== this.set2Winner;
-                                    },
-                                    get p1Sets() {
-                                        let sets = 0;
-                                        if (this.set1Winner === 1) sets++;
-                                        if (this.set2Winner === 1) sets++;
-                                        if (this.showSet3 && this.set3P1 > this.set3P2) sets++;
-                                        return sets;
-                                    },
-                                    get p2Sets() {
-                                        let sets = 0;
-                                        if (this.set1Winner === 2) sets++;
-                                        if (this.set2Winner === 2) sets++;
-                                        if (this.showSet3 && this.set3P2 > this.set3P1) sets++;
-                                        return sets;
-                                    },
-                                    get p1Games() {
-                                        return this.set1P1 + this.set2P1 + (this.showSet3 ? this.set3P1 : 0);
-                                    },
-                                    get p2Games() {
-                                        return this.set1P2 + this.set2P2 + (this.showSet3 ? this.set3P2 : 0);
-                                    },
-                                    get canSave() {
-                                        return this.p1Sets === 2 || this.p2Sets === 2;
-                                    }
-                                }" x-effect="showSet3 = needsSet3">
+                                <div class="flex items-center gap-3">
                                     @if($doubles->completed)
                                         @if($doubles->is_walkover)
                                             <div class="flex items-center gap-2">
@@ -853,10 +903,8 @@
                                                 </span>
                                             </div>
                                         @else
-                                            <div x-show="!editing" class="flex items-center gap-2">
-                                                <span class="rounded-full bg-primary/20 px-4 py-2 text-xl font-bold text-primary">
-                                                    {{ $doubles->player1_sets }} - {{ $doubles->player2_sets }}
-                                                </span>
+                                            <div x-show="!editing" class="flex flex-col items-center gap-1">
+                                                {{-- Set scores above --}}
                                                 <span class="text-sm text-text-muted">
                                                     @if($doubles->set_scores)
                                                         ({{ collect($doubles->set_scores)->map(fn($s) => $s[0].'-'.$s[1])->join(', ') }})
@@ -864,11 +912,10 @@
                                                         ({{ $doubles->player1_games }}-{{ $doubles->player2_games }})
                                                     @endif
                                                 </span>
-                                                <button @click="editing = true" class="ml-2 cursor-pointer text-text-muted transition hover:text-primary" title="Edit result">
-                                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                    </svg>
-                                                </button>
+                                                {{-- Main result below --}}
+                                                <span class="rounded-full bg-primary/20 px-4 py-2 text-xl font-bold text-primary">
+                                                    {{ $doubles->player1_sets }} - {{ $doubles->player2_sets }}
+                                                </span>
                                             </div>
                                         @endif
                                     @else
@@ -895,7 +942,7 @@
 
                                     {{-- Score Entry Form --}}
                                     <div x-show="editing" x-cloak class="flex flex-col gap-3" @keydown.enter="if (canSave) { $wire.updateGameResult({{ $doubles->id }}, p1Sets, p2Sets, p1Games, p2Games, [[set1P1, set1P2], [set2P1, set2P2], ...(showSet3 ? [[set3P1, set3P2]] : [])]); editing = false; }">
-                                        <div class="flex items-center gap-4">
+                                        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
                                             <div class="flex flex-col items-center gap-1">
                                                 <span class="text-xs text-text-muted">{{ __('messages.set') }} 1</span>
                                                 <div class="flex items-center gap-1">
@@ -951,11 +998,10 @@
                                     </div>
                                 </div>
 
-                                <div class="flex flex-1 items-center justify-end gap-3">
-                                    <div class="text-center">
-                                        <div class="font-semibold {{ $doubles->completed && $doubles->player2_sets > $doubles->player1_sets ? 'text-success' : '' }}">
-                                            {{ $doubles->team2Names() }}
-                                        </div>
+                                {{-- Team 2 --}}
+                                <div class="w-full text-center sm:flex-1 sm:text-right">
+                                    <div class="text-sm font-semibold sm:text-base {{ $doubles->completed && $doubles->player2_sets > $doubles->player1_sets ? 'text-success' : '' }}">
+                                        {{ $doubles->team2Names() }}
                                     </div>
                                 </div>
                             </div>
@@ -1061,19 +1107,19 @@
         @elseif($activeTab === 'matches')
             {{-- Matches Tab: Full match list --}}
             @if($tournament->games->count() > 0)
-                <div class="rounded-xl border border-white/10 bg-surface p-6">
+                <div class="rounded-xl border border-white/10 bg-surface p-3 sm:p-6">
                     <h3 class="mb-4 text-lg font-medium">{{ __('messages.all_matches') }}</h3>
 
                     <div class="space-y-3">
                         @foreach($tournament->games->where('is_final', false)->where('is_doubles', false)->sortBy('scheduled_at') as $game)
-                            <div wire:key="game-{{ $game->id }}-{{ $game->scheduled_at?->timestamp ?? 'none' }}-{{ $game->completed ? 'done' : 'pending' }}" class="rounded-lg border border-white/5 bg-surface-light p-4">
+                            <div wire:key="game-{{ $game->id }}-{{ $game->scheduled_at?->timestamp ?? 'none' }}-{{ $game->completed ? 'done' : 'pending' }}" class="rounded-lg border border-white/5 bg-surface-light p-3 sm:p-4">
                                 {{-- Schedule Row --}}
-                                <div class="mb-3 flex items-center justify-between border-b border-white/5 pb-3" x-data="{
+                                <div class="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3" x-data="{
                                     scheduledAt: '{{ $game->scheduled_at?->format('Y-m-d\TH:i') ?? '' }}',
                                     editingSchedule: false
                                 }">
-                                    <div class="flex items-center gap-2 text-sm text-text-muted">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <div class="flex items-center gap-2 text-xs text-text-muted sm:text-sm">
+                                        <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                         <template x-if="!editingSchedule">
@@ -1089,7 +1135,7 @@
                                             </span>
                                         </template>
                                         <template x-if="editingSchedule">
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex flex-wrap items-center gap-2">
                                                 <input
                                                     type="datetime-local"
                                                     x-model="scheduledAt"
@@ -1097,7 +1143,7 @@
                                                     max="{{ $tournament->end_date?->endOfDay()->format('Y-m-d\TH:i') ?? $tournament->start_date->endOfDay()->format('Y-m-d\TH:i') }}"
                                                     step="900"
                                                     @keydown.enter="$wire.updateGameSchedule({{ $game->id }}, scheduledAt); editingSchedule = false"
-                                                    class="cursor-pointer rounded border border-white/20 bg-background px-2 py-1 text-sm"
+                                                    class="cursor-pointer rounded border border-white/20 bg-background px-2 py-1 text-xs sm:text-sm"
                                                 >
                                                 <button
                                                     @click="$wire.updateGameSchedule({{ $game->id }}, scheduledAt); editingSchedule = false"
@@ -1126,10 +1172,14 @@
                                 </div>
 
                                 {{-- Match Row --}}
-                                <div class="flex items-center gap-4">
-                                    <div class="flex flex-1 items-center gap-2">
-                                        <span class="{{ $game->completed && $game->player1_sets > $game->player2_sets ? 'font-semibold text-success' : '' }}">
+                                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm sm:text-base {{ $game->completed && $game->player1_sets > $game->player2_sets ? 'font-semibold text-success' : '' }}">
                                             {{ $game->player1->name }}
+                                        </span>
+                                        <span class="text-xs text-text-muted sm:text-sm">vs</span>
+                                        <span class="text-sm sm:text-base {{ $game->completed && $game->player2_sets > $game->player1_sets ? 'font-semibold text-success' : '' }}">
+                                            {{ $game->player2->name }}
                                         </span>
                                         <button
                                             wire:click="swapPlayers({{ $game->id }})"
@@ -1273,7 +1323,7 @@
                                         @endif
 
                                             <div x-show="editing" x-cloak class="flex flex-col gap-3" @keydown.enter="if (canSave) { $wire.updateGameResult({{ $game->id }}, p1Sets, p2Sets, p1Games, p2Games, [[set1P1, set1P2], [set2P1, set2P2], ...(showSet3 ? [[set3P1, set3P2]] : [])]); editing = false; }">
-                                                <div class="flex items-center gap-4">
+                                                <div class="flex flex-wrap items-center gap-2 sm:gap-4">
                                                     {{-- Set 1 --}}
                                                     <div class="flex flex-col items-center gap-1">
                                                         <span class="text-xs text-text-muted">{{ __('messages.set') }} 1</span>
@@ -1283,7 +1333,7 @@
                                                                 x-model.number="set1P1"
                                                                 min="0"
                                                                 max="7"
-                                                                class="w-10 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm"
+                                                                class="w-9 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm sm:w-10"
                                                             >
                                                             <span class="text-text-muted">-</span>
                                                             <input
@@ -1291,7 +1341,7 @@
                                                                 x-model.number="set1P2"
                                                                 min="0"
                                                                 max="7"
-                                                                class="w-10 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm"
+                                                                class="w-9 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm sm:w-10"
                                                             >
                                                         </div>
                                                     </div>
@@ -1305,7 +1355,7 @@
                                                                 x-model.number="set2P1"
                                                                 min="0"
                                                                 max="7"
-                                                                class="w-10 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm"
+                                                                class="w-9 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm sm:w-10"
                                                             >
                                                             <span class="text-text-muted">-</span>
                                                             <input
@@ -1313,7 +1363,7 @@
                                                                 x-model.number="set2P2"
                                                                 min="0"
                                                                 max="7"
-                                                                class="w-10 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm"
+                                                                class="w-9 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm sm:w-10"
                                                             >
                                                         </div>
                                                     </div>
@@ -1326,14 +1376,14 @@
                                                                 type="number"
                                                                 x-model.number="set3P1"
                                                                 min="0"
-                                                                class="w-10 rounded border border-secondary/50 bg-background px-1 py-1 text-center text-sm"
+                                                                class="w-9 rounded border border-secondary/50 bg-background px-1 py-1 text-center text-sm sm:w-10"
                                                             >
                                                             <span class="text-text-muted">-</span>
                                                             <input
                                                                 type="number"
                                                                 x-model.number="set3P2"
                                                                 min="0"
-                                                                class="w-10 rounded border border-secondary/50 bg-background px-1 py-1 text-center text-sm"
+                                                                class="w-9 rounded border border-secondary/50 bg-background px-1 py-1 text-center text-sm sm:w-10"
                                                             >
                                                         </div>
                                                     </div>
@@ -1344,24 +1394,23 @@
                                                         @click="showSet3 = true"
                                                         class="cursor-pointer rounded border border-dashed border-white/20 px-2 py-1 text-xs text-text-muted transition hover:border-secondary hover:text-secondary"
                                                     >
-                                                        + {{ __('messages.set') }} 3
+                                                        +S3
                                                     </button>
                                                 </div>
 
-                                                <div class="flex flex-col items-center gap-2">
-                                                    <div class="flex items-center gap-2">
-                                                        <span class="text-xs text-text-muted">
-                                                            {{ __('messages.result') }}: <span class="font-medium text-text-primary" x-text="p1Sets + ' - ' + p2Sets"></span>
-                                                            (<span x-text="p1Games + '-' + p2Games"></span>)
-                                                        </span>
-                                                        <button
-                                                            @click="if (canSave) { $wire.updateGameResult({{ $game->id }}, p1Sets, p2Sets, p1Games, p2Games, [[set1P1, set1P2], [set2P1, set2P2], ...(showSet3 ? [[set3P1, set3P2]] : [])]); editing = false; }"
-                                                            :disabled="!canSave"
-                                                            :class="canSave ? 'cursor-pointer bg-primary hover:bg-primary/90' : 'cursor-not-allowed bg-gray-500 opacity-50'"
-                                                            class="rounded px-3 py-1 text-sm font-medium text-white"
-                                                        >
-                                                            Save
-                                                        </button>
+                                                <div class="flex flex-wrap items-center justify-center gap-2">
+                                                    <span class="text-xs text-text-muted">
+                                                        {{ __('messages.result') }}: <span class="font-medium text-text-primary" x-text="p1Sets + ' - ' + p2Sets"></span>
+                                                        (<span x-text="p1Games + '-' + p2Games"></span>)
+                                                    </span>
+                                                    <button
+                                                        @click="if (canSave) { $wire.updateGameResult({{ $game->id }}, p1Sets, p2Sets, p1Games, p2Games, [[set1P1, set1P2], [set2P1, set2P2], ...(showSet3 ? [[set3P1, set3P2]] : [])]); editing = false; }"
+                                                        :disabled="!canSave"
+                                                        :class="canSave ? 'cursor-pointer bg-primary hover:bg-primary/90' : 'cursor-not-allowed bg-gray-500 opacity-50'"
+                                                        class="rounded px-3 py-1 text-sm font-medium text-white"
+                                                    >
+                                                        Save
+                                                    </button>
                                                         <button
                                                             @click="editing = false; showSet3 = false; set1P1 = 0; set1P2 = 0; set2P1 = 0; set2P2 = 0; set3P1 = 0; set3P2 = 0;"
                                                             class="cursor-pointer text-text-muted hover:text-text-secondary"
@@ -1555,7 +1604,7 @@
         @if($editingTournament)
             <template x-teleport="body">
                 <div
-                    class="fixed inset-0 z-50 flex items-center justify-center"
+                    class="fixed inset-0 z-50 flex items-center justify-center p-4"
                     @keydown.escape.window="$wire.cancelEditingTournament()"
                 >
                     {{-- Backdrop --}}
@@ -1565,10 +1614,10 @@
                     ></div>
 
                     {{-- Modal Panel --}}
-                    <div class="relative w-full max-w-xl rounded-2xl border border-white/10 bg-surface p-6 shadow-xl">
-                        <h3 class="mb-6 text-xl font-semibold">{{ __('messages.edit_tournament') }}</h3>
+                    <div class="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-white/10 bg-surface p-4 shadow-xl sm:p-6">
+                        <h3 class="mb-4 text-lg font-semibold sm:mb-6 sm:text-xl">{{ __('messages.edit_tournament') }}</h3>
 
-                        <form wire:submit="updateTournament" class="space-y-5">
+                        <form wire:submit="updateTournament" class="space-y-4 sm:space-y-5">
                             {{-- Tournament Name --}}
                             <div>
                                 <label for="editName" class="mb-2 block text-sm font-medium text-text-secondary">{{ __('messages.tournament_name') }}</label>
@@ -1585,7 +1634,7 @@
                             {{-- Date Range --}}
                             <div>
                                 <label class="mb-2 block text-sm font-medium text-text-secondary">{{ __('messages.tournament_dates') }}</label>
-                                <div class="flex items-center gap-3">
+                                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                                     <div class="flex-1">
                                         <input
                                             type="date"
@@ -1593,7 +1642,7 @@
                                             class="w-full cursor-pointer rounded-lg border border-white/10 bg-background/50 px-4 py-3 text-text-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                         >
                                     </div>
-                                    <span class="text-text-muted">{{ __('messages.to') }}</span>
+                                    <span class="hidden text-text-muted sm:block">{{ __('messages.to') }}</span>
                                     <div class="flex-1">
                                         <input
                                             type="date"
