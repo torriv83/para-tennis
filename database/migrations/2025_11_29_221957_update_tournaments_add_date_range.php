@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tournaments', function (Blueprint $table) {
-            $table->renameColumn('date', 'start_date');
-        });
+        if (Schema::hasColumn('tournaments', 'date')) {
+            Schema::table('tournaments', function (Blueprint $table) {
+                $table->renameColumn('date', 'start_date');
+            });
+        }
 
-        Schema::table('tournaments', function (Blueprint $table) {
-            $table->date('end_date')->nullable()->after('start_date');
-        });
+        if (! Schema::hasColumn('tournaments', 'end_date')) {
+            Schema::table('tournaments', function (Blueprint $table) {
+                $table->date('end_date')->nullable()->after('start_date');
+            });
+        }
     }
 
     /**
@@ -25,9 +29,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('tournaments', function (Blueprint $table) {
-            $table->renameColumn('start_date', 'date');
-            $table->dropColumn('end_date');
-        });
+        if (Schema::hasColumn('tournaments', 'end_date')) {
+            Schema::table('tournaments', function (Blueprint $table) {
+                $table->dropColumn('end_date');
+            });
+        }
+
+        if (Schema::hasColumn('tournaments', 'start_date')) {
+            Schema::table('tournaments', function (Blueprint $table) {
+                $table->renameColumn('start_date', 'date');
+            });
+        }
     }
 };

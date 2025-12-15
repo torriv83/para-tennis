@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('tournaments', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->date('date');
+            $table->date('start_date');
+            $table->date('end_date')->nullable();
             $table->string('format')->default('round_robin');
             $table->timestamps();
         });
