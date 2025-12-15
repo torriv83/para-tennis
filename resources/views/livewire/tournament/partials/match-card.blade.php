@@ -61,7 +61,7 @@
                     @if($game->scheduled_at)
                         {{ localized_date($game->scheduled_at, 'datetime') }}
                     @else
-                        {{ __('messages.no_schedule') }}
+                        -
                     @endif
                 </span>
             @endauth
@@ -76,14 +76,10 @@
     </div>
 
     {{-- Match Row --}}
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-        <div class="flex items-center gap-2">
+    <div class="flex items-center gap-4">
+        <div class="flex flex-1 items-center gap-2">
             <span class="text-sm sm:text-base {{ $game->completed && $game->player1_sets > $game->player2_sets ? 'font-semibold text-success' : '' }}">
                 {{ $game->player1->name }}
-            </span>
-            <span class="text-xs text-text-muted sm:text-sm">vs</span>
-            <span class="text-sm sm:text-base {{ $game->completed && $game->player2_sets > $game->player1_sets ? 'font-semibold text-success' : '' }}">
-                {{ $game->player2->name }}
             </span>
             @auth
                 <button
@@ -101,7 +97,7 @@
         @include('livewire.tournament.partials.score-entry', ['game' => $game, 'variant' => 'default'])
 
         <div class="flex-1 text-right">
-            <span class="{{ $game->completed && $game->player2_sets > $game->player1_sets ? 'font-semibold text-success' : '' }}">
+            <span class="text-sm sm:text-base {{ $game->completed && $game->player2_sets > $game->player1_sets ? 'font-semibold text-success' : '' }}">
                 {{ $game->player2->name }}
             </span>
         </div>

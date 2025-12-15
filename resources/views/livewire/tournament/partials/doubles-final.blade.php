@@ -135,8 +135,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            @else
-                                <span class="text-sm text-text-muted">{{ __('messages.pending') }}</span>
                             @endauth
                         @endif
 

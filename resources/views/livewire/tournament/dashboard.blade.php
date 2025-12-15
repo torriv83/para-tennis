@@ -1,12 +1,7 @@
 <div class="space-y-8">
     @if(!$tournament)
-        {{-- Show tournament list for guests, create form for authenticated users --}}
-        @guest
-            @include('livewire.tournament.partials.tournament-list')
-        @endguest
-        @auth
-            @include('livewire.tournament.partials.create-tournament')
-        @endauth
+        {{-- Show tournament list for everyone --}}
+        @include('livewire.tournament.partials.tournament-list')
     @else
         {{-- Tournament Header (Navigation + Info) --}}
         @include('livewire.tournament.partials.tournament-header')

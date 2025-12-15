@@ -120,11 +120,11 @@
 </div>
 
 {{-- Tournament History --}}
-@if($this->allTournaments->count() > 0)
+@if($this->pastTournaments->count() > 0)
     <div class="rounded-xl border border-white/10 bg-surface p-4 sm:p-6">
         <h3 class="mb-4 text-lg font-medium">{{ __('messages.previous_tournaments') }}</h3>
         <div class="space-y-2">
-            @foreach($this->allTournaments as $t)
+            @foreach($this->pastTournaments as $t)
                 <button
                     wire:key="history-{{ $t->id }}"
                     wire:click="selectTournament({{ $t->id }})"

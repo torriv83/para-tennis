@@ -65,10 +65,28 @@ class Dashboard extends Component
                 'games.player1Partner',
                 'games.player2Partner',
             ]);
+        } elseif (! request()->has('new')) {
+            // Redirect to active tournament if one exists (unless ?new is set)
+            $activeTournament = $this->findActiveTournament();
+            if ($activeTournament) {
+                $this->redirect(route('home', $activeTournament), navigate: true);
+
+                return;
+            }
         }
 
         $this->startDate = now()->format('Y-m-d');
         $this->endDate = now()->addDays(2)->format('Y-m-d');
+    }
+
+    protected function findActiveTournament(): ?Tournament
+    {
+        $today = now()->startOfDay();
+
+        return Tournament::query()
+            ->whereDate('start_date', '<=', $today)
+            ->whereDate('end_date', '>=', $today)
+            ->first();
     }
 
     public function createTournament(): void
@@ -259,7 +277,7 @@ class Dashboard extends Component
 
     public function newTournament(): void
     {
-        $this->redirect(route('home'), navigate: true);
+        $this->redirect(route('home').'?new', navigate: true);
     }
 
     public function selectTournament(int $tournamentId): void
@@ -669,6 +687,17 @@ class Dashboard extends Component
     {
         return Tournament::withCount('players')
             ->with(['games' => fn ($q) => $q->select('id', 'tournament_id', 'completed', 'is_final', 'is_doubles')])
+            ->orderByDesc('start_date')
+            ->get();
+    }
+
+    #[Computed]
+    public function pastTournaments(): \Illuminate\Database\Eloquent\Collection
+    {
+        $today = now()->startOfDay();
+
+        return Tournament::withCount('players')
+            ->whereDate('end_date', '<', $today)
             ->orderByDesc('start_date')
             ->get();
     }

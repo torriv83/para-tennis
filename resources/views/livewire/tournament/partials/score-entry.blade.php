@@ -16,13 +16,13 @@
     $showEditButton = $showEditButton ?? true;
 
     $enterButtonClass = match($variant) {
-        'final', 'doubles' => 'cursor-pointer rounded-md border border-secondary/50 bg-secondary/10 px-4 py-2 text-sm font-medium text-secondary transition hover:bg-secondary/20',
-        default => 'cursor-pointer rounded-md border border-white/20 px-4 py-2 text-sm text-text-secondary transition hover:border-primary hover:text-primary',
+        'final', 'doubles' => 'cursor-pointer rounded-md border border-secondary/50 bg-secondary/10 px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium text-secondary transition hover:bg-secondary/20',
+        default => 'cursor-pointer rounded-md border border-white/20 px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm text-text-secondary transition hover:border-primary hover:text-primary',
     };
 
     $scoreDisplayClass = match($variant) {
-        'final', 'doubles' => 'rounded-full bg-secondary/20 px-4 py-2 text-xl font-bold text-secondary',
-        default => 'rounded-full bg-surface px-3 py-1 text-lg font-semibold',
+        'final', 'doubles' => 'rounded-full bg-secondary/20 px-2 py-1 text-base sm:px-4 sm:py-2 sm:text-xl font-bold text-secondary',
+        default => 'rounded-full bg-surface px-2 py-1 text-sm sm:px-3 sm:text-lg font-semibold',
     };
 
     $enterButtonText = match($variant) {
@@ -135,7 +135,11 @@
             </div>
         @endif
     @else
-        {{-- Not completed - show enter result button --}}
+        {{-- Not completed - show placeholder score --}}
+        <div x-show="!editing" class="flex items-center gap-1 sm:gap-2">
+            <span class="{{ $scoreDisplayClass }}">0 - 0</span>
+            <span class="hidden text-sm text-text-muted sm:inline">(0-0, 0-0)</span>
+        </div>
         @auth
             <div x-show="!editing" class="flex items-center gap-2" x-data="{ showWalkoverMenu: false }">
                 <button @click="editing = true" class="{{ $enterButtonClass }}">
@@ -175,8 +179,6 @@
                     </div>
                 @endif
             </div>
-        @else
-            <span class="text-sm text-text-muted">{{ __('messages.pending') }}</span>
         @endauth
     @endif
 
