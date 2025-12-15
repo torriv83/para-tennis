@@ -20,9 +20,14 @@ return [
     'round_robin_finals_desc' => 'Round robin first, then top 2 players compete in a championship final.',
     'create_tournament' => 'Create Tournament',
 
-    // Previous Tournaments
+    // Tournament List
+    'active_tournament' => 'Active Tournament',
     'previous_tournaments' => 'Previous Tournaments',
     'players' => 'Players',
+    'matches_completed' => 'matches played',
+    'view_tournament' => 'View tournament',
+    'no_tournaments' => 'No tournaments yet',
+    'no_tournaments_desc' => 'There are no tournaments to display. Contact the administrator to create a new tournament.',
 
     // Navigation
     'all_tournaments' => 'All Tournaments',

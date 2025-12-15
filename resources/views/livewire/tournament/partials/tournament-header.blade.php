@@ -78,46 +78,48 @@
     </div>
 
     {{-- Actions Menu --}}
-    <div x-data="{ open: false }" class="relative">
-        <button
-            @click="open = !open"
-            class="flex cursor-pointer items-center justify-center rounded-lg p-2 text-text-secondary transition hover:bg-surface-light hover:text-text-primary"
-        >
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-            </svg>
-        </button>
+    @auth
+        <div x-data="{ open: false }" class="relative">
+            <button
+                @click="open = !open"
+                class="flex cursor-pointer items-center justify-center rounded-lg p-2 text-text-secondary transition hover:bg-surface-light hover:text-text-primary"
+            >
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                </svg>
+            </button>
 
-        <div
-            x-show="open"
-            x-cloak
-            @click.away="open = false"
-            x-transition
-            class="absolute right-0 top-full z-50 mt-2 w-48 rounded-xl border border-white/10 bg-surface p-2 shadow-xl"
-        >
-            <button
-                wire:click="startEditingTournament"
-                @click="open = false"
-                class="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-secondary transition hover:bg-surface-light hover:text-text-primary"
+            <div
+                x-show="open"
+                x-cloak
+                @click.away="open = false"
+                x-transition
+                class="absolute right-0 top-full z-50 mt-2 w-48 rounded-xl border border-white/10 bg-surface p-2 shadow-xl"
             >
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-                {{ __('messages.edit_tournament') }}
-            </button>
-            <button
-                wire:click="deleteTournament"
-                wire:confirm="{{ __('messages.delete_confirm') }}"
-                @click="open = false"
-                class="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-danger transition hover:bg-danger/10"
-            >
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                {{ __('messages.delete_tournament') }}
-            </button>
+                <button
+                    wire:click="startEditingTournament"
+                    @click="open = false"
+                    class="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-secondary transition hover:bg-surface-light hover:text-text-primary"
+                >
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    {{ __('messages.edit_tournament') }}
+                </button>
+                <button
+                    wire:click="deleteTournament"
+                    wire:confirm="{{ __('messages.delete_confirm') }}"
+                    @click="open = false"
+                    class="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-danger transition hover:bg-danger/10"
+                >
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    {{ __('messages.delete_tournament') }}
+                </button>
+            </div>
         </div>
-    </div>
+    @endauth
 </div>
 
 {{-- Tournament Info Header --}}
@@ -126,14 +128,16 @@
         <div class="flex items-center gap-2">
             <h2 class="min-w-0 truncate text-xl font-semibold sm:text-2xl">{{ $tournament->name }}</h2>
             {{-- Manage Players button - mobile only, next to title --}}
-            <button
-                wire:click="togglePlayersDrawer"
-                class="flex shrink-0 cursor-pointer items-center rounded-lg border border-white/10 bg-surface-light p-2 text-sm font-medium transition hover:border-white/20 sm:hidden"
-            >
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-            </button>
+            @auth
+                <button
+                    wire:click="togglePlayersDrawer"
+                    class="flex shrink-0 cursor-pointer items-center rounded-lg border border-white/10 bg-surface-light p-2 text-sm font-medium transition hover:border-white/20 sm:hidden"
+                >
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </button>
+            @endauth
         </div>
         <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-secondary sm:text-sm">
             <span class="flex items-center gap-1">
@@ -168,14 +172,16 @@
             <div class="hidden text-xs text-text-muted sm:block">{{ __('messages.matches') }}</div>
         </div>
         {{-- Manage Players button - desktop only --}}
-        <button
-            wire:click="togglePlayersDrawer"
-            class="hidden cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-surface-light px-4 py-2 text-sm font-medium transition hover:border-white/20 sm:flex"
-        >
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            {{ __('messages.manage_players') }}
-        </button>
+        @auth
+            <button
+                wire:click="togglePlayersDrawer"
+                class="hidden cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-surface-light px-4 py-2 text-sm font-medium transition hover:border-white/20 sm:flex"
+            >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                {{ __('messages.manage_players') }}
+            </button>
+        @endauth
     </div>
 </div>

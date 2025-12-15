@@ -667,7 +667,10 @@ class Dashboard extends Component
     #[Computed]
     public function allTournaments(): \Illuminate\Database\Eloquent\Collection
     {
-        return Tournament::withCount('players')->orderByDesc('start_date')->get();
+        return Tournament::withCount('players')
+            ->with(['games' => fn ($q) => $q->select('id', 'tournament_id', 'completed', 'is_final', 'is_doubles')])
+            ->orderByDesc('start_date')
+            ->get();
     }
 
     #[Computed]

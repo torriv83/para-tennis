@@ -20,9 +20,14 @@ return [
     'round_robin_finals_desc' => 'Спочатку коловий турнір, потім топ-2 гравці змагаються у фіналі чемпіонату.',
     'create_tournament' => 'Створити турнір',
 
-    // Previous Tournaments
+    // Tournament List
+    'active_tournament' => 'Активний турнір',
     'previous_tournaments' => 'Попередні турніри',
     'players' => 'Гравці',
+    'matches_completed' => 'матчів зіграно',
+    'view_tournament' => 'Переглянути турнір',
+    'no_tournaments' => 'Ще немає турнірів',
+    'no_tournaments_desc' => 'Немає турнірів для відображення. Зв\'яжіться з адміністратором, щоб створити новий турнір.',
 
     // Navigation
     'all_tournaments' => 'Усі турніри',

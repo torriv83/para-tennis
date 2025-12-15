@@ -20,9 +20,14 @@ return [
     'round_robin_finals_desc' => 'Round robin først, deretter konkurrerer topp 2 spillere i en mesterskapsfinale.',
     'create_tournament' => 'Opprett turnering',
 
-    // Previous Tournaments
+    // Tournament List
+    'active_tournament' => 'Pågående turnering',
     'previous_tournaments' => 'Tidligere turneringer',
     'players' => 'Spillere',
+    'matches_completed' => 'kamper spilt',
+    'view_tournament' => 'Se turnering',
+    'no_tournaments' => 'Ingen turneringer ennå',
+    'no_tournaments_desc' => 'Det er ingen turneringer å vise. Kontakt administratoren for å opprette en ny turnering.',
 
     // Navigation
     'all_tournaments' => 'Alle turneringer',

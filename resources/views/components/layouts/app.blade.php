@@ -20,7 +20,10 @@
         <header class="mb-8 sm:mb-12">
             <div class="mb-2 flex items-center justify-between gap-4">
                 <h1 class="min-w-0 truncate text-2xl font-semibold sm:text-3xl md:text-4xl">{{ __('messages.app_name') }}</h1>
-                <livewire:language-switcher />
+                <div class="flex shrink-0 items-center gap-3">
+                    <livewire:admin-login />
+                    <livewire:language-switcher />
+                </div>
             </div>
             <p class="text-sm text-text-secondary sm:text-base">{{ __('messages.tournament_management') }}</p>
         </header>
