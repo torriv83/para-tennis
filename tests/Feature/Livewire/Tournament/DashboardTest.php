@@ -137,7 +137,7 @@ it('calculates standings correctly with walkover', function () {
         ->and($aliceStanding['losses'])->toBe(0)
         ->and($bobStanding['wins'])->toBe(0)
         ->and($bobStanding['played'])->toBe(0)
-        ->and($bobStanding['losses'])->toBe(0);
+        ->and($bobStanding['losses'])->toBe(0); // Walkover: no match played, no loss recorded
 });
 
 it('can create a tournament', function () {
@@ -266,4 +266,174 @@ it('can remove player', function () {
         ->call('removePlayer', $player->id);
 
     $this->assertDatabaseMissing('players', ['id' => $player->id]);
+});
+
+// Doubles Feature Tests
+
+it('can create a tournament with doubles enabled', function () {
+    Livewire::test(Dashboard::class)
+        ->set('tournamentName', 'Doubles Championship')
+        ->set('startDate', '2025-03-01')
+        ->set('endDate', '2025-03-03')
+        ->set('tournamentFormat', 'round_robin')
+        ->set('hasDoubles', true)
+        ->call('createTournament');
+
+    $this->assertDatabaseHas('tournaments', [
+        'name' => 'Doubles Championship',
+        'has_doubles' => true,
+    ]);
+});
+
+it('can create a doubles match', function () {
+    $this->tournament->update(['has_doubles' => true]);
+
+    $player1 = Player::factory()->for($this->tournament)->create(['name' => 'Alice']);
+    $player2 = Player::factory()->for($this->tournament)->create(['name' => 'Bob']);
+    $player3 = Player::factory()->for($this->tournament)->create(['name' => 'Carol']);
+    $player4 = Player::factory()->for($this->tournament)->create(['name' => 'Dave']);
+
+    Livewire::test(Dashboard::class)
+        ->set('tournament', $this->tournament)
+        ->set('showDoublesForm', true)
+        ->set('doublesTeam1Player1', $player1->id)
+        ->set('doublesTeam1Player2', $player2->id)
+        ->set('doublesTeam2Player1', $player3->id)
+        ->set('doublesTeam2Player2', $player4->id)
+        ->call('createDoublesMatch');
+
+    $doublesGame = $this->tournament->fresh()->games->first();
+
+    expect($doublesGame)->not->toBeNull()
+        ->and($doublesGame->is_doubles)->toBeTrue()
+        ->and($doublesGame->player1_id)->toBe($player1->id)
+        ->and($doublesGame->player1_partner_id)->toBe($player2->id)
+        ->and($doublesGame->player2_id)->toBe($player3->id)
+        ->and($doublesGame->player2_partner_id)->toBe($player4->id);
+});
+
+it('prevents creating doubles match when tournament does not have doubles enabled', function () {
+    $this->tournament->update(['has_doubles' => false]);
+
+    $player1 = Player::factory()->for($this->tournament)->create(['name' => 'Alice']);
+    $player2 = Player::factory()->for($this->tournament)->create(['name' => 'Bob']);
+    $player3 = Player::factory()->for($this->tournament)->create(['name' => 'Carol']);
+    $player4 = Player::factory()->for($this->tournament)->create(['name' => 'Dave']);
+
+    Livewire::test(Dashboard::class)
+        ->set('tournament', $this->tournament)
+        ->set('doublesTeam1Player1', $player1->id)
+        ->set('doublesTeam1Player2', $player2->id)
+        ->set('doublesTeam2Player1', $player3->id)
+        ->set('doublesTeam2Player2', $player4->id)
+        ->call('createDoublesMatch');
+
+    expect($this->tournament->fresh()->games)->toHaveCount(0);
+});
+
+it('prevents creating doubles match with duplicate players', function () {
+    $this->tournament->update(['has_doubles' => true]);
+
+    $player1 = Player::factory()->for($this->tournament)->create(['name' => 'Alice']);
+    $player2 = Player::factory()->for($this->tournament)->create(['name' => 'Bob']);
+    $player3 = Player::factory()->for($this->tournament)->create(['name' => 'Carol']);
+
+    Livewire::test(Dashboard::class)
+        ->set('tournament', $this->tournament)
+        ->set('doublesTeam1Player1', $player1->id)
+        ->set('doublesTeam1Player2', $player2->id)
+        ->set('doublesTeam2Player1', $player1->id) // Duplicate
+        ->set('doublesTeam2Player2', $player3->id)
+        ->call('createDoublesMatch');
+
+    expect($this->tournament->fresh()->games)->toHaveCount(0);
+});
+
+it('returns doubles match via computed property', function () {
+    $this->tournament->update(['has_doubles' => true]);
+
+    $player1 = Player::factory()->for($this->tournament)->create();
+    $player2 = Player::factory()->for($this->tournament)->create();
+    $player3 = Player::factory()->for($this->tournament)->create();
+    $player4 = Player::factory()->for($this->tournament)->create();
+
+    $doublesGame = Game::factory()->for($this->tournament)->create([
+        'player1_id' => $player1->id,
+        'player1_partner_id' => $player2->id,
+        'player2_id' => $player3->id,
+        'player2_partner_id' => $player4->id,
+        'is_doubles' => true,
+    ]);
+
+    $component = Livewire::test(Dashboard::class)
+        ->set('tournament', $this->tournament);
+
+    $match = $component->instance()->doublesMatch;
+
+    expect($match)->not->toBeNull()
+        ->and($match->id)->toBe($doublesGame->id)
+        ->and($match->is_doubles)->toBeTrue();
+});
+
+it('can swap players in a doubles match including partners', function () {
+    $this->tournament->update(['has_doubles' => true]);
+
+    $player1 = Player::factory()->for($this->tournament)->create(['name' => 'Alice']);
+    $player2 = Player::factory()->for($this->tournament)->create(['name' => 'Bob']);
+    $player3 = Player::factory()->for($this->tournament)->create(['name' => 'Carol']);
+    $player4 = Player::factory()->for($this->tournament)->create(['name' => 'Dave']);
+
+    $game = Game::factory()->for($this->tournament)->create([
+        'player1_id' => $player1->id,
+        'player1_partner_id' => $player2->id,
+        'player2_id' => $player3->id,
+        'player2_partner_id' => $player4->id,
+        'is_doubles' => true,
+        'player1_sets' => 2,
+        'player2_sets' => 1,
+        'completed' => true,
+    ]);
+
+    Livewire::test(Dashboard::class)
+        ->set('tournament', $this->tournament)
+        ->call('swapPlayers', $game->id);
+
+    $game->refresh();
+
+    expect($game->player1_id)->toBe($player3->id)
+        ->and($game->player1_partner_id)->toBe($player4->id)
+        ->and($game->player2_id)->toBe($player1->id)
+        ->and($game->player2_partner_id)->toBe($player2->id)
+        ->and($game->player1_sets)->toBe(1)
+        ->and($game->player2_sets)->toBe(2);
+});
+
+it('walkover does not count as loss for withdrawing player', function () {
+    $player1 = $this->tournament->players()->create(['name' => 'Alice']);
+    $player2 = $this->tournament->players()->create(['name' => 'Bob']);
+
+    $this->tournament->games()->create([
+        'player1_id' => $player1->id,
+        'player2_id' => $player2->id,
+        'is_walkover' => true,
+        'walkover_winner_id' => $player1->id,
+        'completed' => true,
+        'player1_sets' => 0,
+        'player2_sets' => 0,
+        'player1_games' => 0,
+        'player2_games' => 0,
+    ]);
+
+    $component = Livewire::test(Dashboard::class)
+        ->set('tournament', $this->tournament);
+
+    $standings = $component->instance()->standings;
+    $aliceStanding = collect($standings)->firstWhere('player.id', $player1->id);
+    $bobStanding = collect($standings)->firstWhere('player.id', $player2->id);
+
+    // Walkover: winner advances (gets a win), but no match played so no loss recorded
+    expect($aliceStanding['wins'])->toBe(1)
+        ->and($aliceStanding['losses'])->toBe(0)
+        ->and($bobStanding['wins'])->toBe(0)
+        ->and($bobStanding['losses'])->toBe(0);
 });

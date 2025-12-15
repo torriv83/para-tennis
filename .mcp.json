@@ -15,16 +15,6 @@
             "env": {
                 "SITE_PATH": "P:\\Herd\\Tennis"
             }
-        },
-        "chrome-devtools": {
-            "command": "cmd",
-            "args": [
-                "/c",
-                "npx",
-                "-y",
-                "chrome-devtools-mcp@latest",
-                "--headless=true"
-            ]
         }
     }
 }

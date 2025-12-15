@@ -139,7 +139,7 @@
                                 </span>
                             </div>
                             <span class="text-sm text-text-muted">
-                                {{ $t->players->count() }} {{ __('messages.players') }}
+                                {{ $t->players_count }} {{ __('messages.players') }}
                             </span>
                         </button>
                     @endforeach

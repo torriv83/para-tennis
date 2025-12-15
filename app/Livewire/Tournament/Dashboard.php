@@ -193,7 +193,7 @@ class Dashboard extends Component
             $swappedSetScores = array_map(fn ($set) => [$set[1], $set[0]], $game->set_scores);
         }
 
-        $game->update([
+        $updateData = [
             'player1_id' => $game->player2_id,
             'player2_id' => $game->player1_id,
             'player1_sets' => $game->player2_sets,
@@ -201,7 +201,15 @@ class Dashboard extends Component
             'player1_games' => $game->player2_games,
             'player2_games' => $game->player1_games,
             'set_scores' => $swappedSetScores,
-        ]);
+        ];
+
+        // Swap partners for doubles matches
+        if ($game->is_doubles) {
+            $updateData['player1_partner_id'] = $game->player2_partner_id;
+            $updateData['player2_partner_id'] = $game->player1_partner_id;
+        }
+
+        $game->update($updateData);
 
         $this->tournament->load(['games.player1', 'games.player2', 'games.player1Partner', 'games.player2Partner']);
     }
@@ -659,7 +667,7 @@ class Dashboard extends Component
     #[Computed]
     public function allTournaments(): \Illuminate\Database\Eloquent\Collection
     {
-        return Tournament::orderByDesc('start_date')->get();
+        return Tournament::withCount('players')->orderByDesc('start_date')->get();
     }
 
     #[Computed]
