@@ -90,7 +90,7 @@
             this.editing = false;
         }
     }
-}" x-effect="showSet3 = needsSet3">
+}" @start-editing-{{ $game->id }}.window="editing = true" x-effect="showSet3 = needsSet3">
     {{-- Completed match display --}}
     @if($game->completed)
         @if($game->is_walkover)
@@ -141,7 +141,8 @@
             <span class="hidden text-sm text-text-muted sm:inline">(0-0, 0-0)</span>
         </div>
         @auth
-            <div x-show="!editing" class="flex items-center gap-2" x-data="{ showWalkoverMenu: false }">
+            {{-- Desktop: Original buttons (mobile uses action menu in match-card) --}}
+            <div x-show="!editing" class="hidden items-center gap-2 sm:flex" x-data="{ showWalkoverMenu: false }">
                 <button @click="editing = true" class="{{ $enterButtonClass }}">
                     {{ $enterButtonText }}
                 </button>

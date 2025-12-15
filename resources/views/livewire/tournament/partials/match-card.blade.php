@@ -10,7 +10,9 @@
     {{-- Schedule Row --}}
     <div class="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3" x-data="{
         scheduledAt: '{{ $game->scheduled_at?->format('Y-m-d\TH:i') ?? '' }}',
-        editingSchedule: false
+        editingSchedule: false,
+        showActionMenu: false,
+        showWalkoverMenu: false
     }">
         <div class="flex items-center gap-2 text-xs text-text-muted sm:text-sm">
             <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -66,13 +68,81 @@
                 </span>
             @endauth
         </div>
-        @if($game->completed)
-            @if($game->is_walkover)
-                <span class="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-medium text-amber-400">{{ __('messages.walkover') }}</span>
-            @else
-                <span class="rounded-full bg-success/20 px-2 py-0.5 text-xs font-medium text-success">{{ __('messages.completed') }}</span>
+        <div class="flex items-center gap-2">
+            @if($game->completed)
+                @if($game->is_walkover)
+                    <span class="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-medium text-amber-400">{{ __('messages.walkover') }}</span>
+                @else
+                    <span class="rounded-full bg-success/20 px-2 py-0.5 text-xs font-medium text-success">{{ __('messages.completed') }}</span>
+                @endif
             @endif
-        @endif
+
+            {{-- Mobile: Action menu (only for incomplete matches) --}}
+            @auth
+                @if(!$game->completed)
+                    <div class="relative sm:hidden">
+                        <button
+                            @click="showActionMenu = !showActionMenu"
+                            class="cursor-pointer rounded-md p-1.5 text-text-muted transition hover:bg-surface hover:text-text-secondary"
+                        >
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="5" r="2"/>
+                                <circle cx="12" cy="12" r="2"/>
+                                <circle cx="12" cy="19" r="2"/>
+                            </svg>
+                        </button>
+                        <div
+                            x-show="showActionMenu"
+                            x-cloak
+                            @click.away="showActionMenu = false; showWalkoverMenu = false"
+                            class="absolute right-0 top-full z-10 mt-2 w-48 rounded-lg border border-white/10 bg-surface p-2 shadow-xl"
+                        >
+                            <button
+                                @click="$dispatch('start-editing-{{ $game->id }}'); showActionMenu = false"
+                                class="flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-left text-sm transition hover:bg-surface-light"
+                            >
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                                {{ __('messages.enter_result') }}
+                            </button>
+                            <div class="relative">
+                                <button
+                                    @click="showWalkoverMenu = !showWalkoverMenu"
+                                    class="flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-left text-sm text-amber-400 transition hover:bg-surface-light"
+                                >
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                    </svg>
+                                    W.O.
+                                </button>
+                                <div
+                                    x-show="showWalkoverMenu"
+                                    x-cloak
+                                    class="mt-1 border-t border-white/10 pt-1"
+                                >
+                                    <p class="px-3 py-1 text-xs text-text-muted">{{ __('messages.select_winner') }}</p>
+                                    <button
+                                        wire:click="recordWalkover({{ $game->id }}, {{ $game->player1_id }})"
+                                        @click="showActionMenu = false; showWalkoverMenu = false"
+                                        class="w-full cursor-pointer rounded px-3 py-2 text-left text-sm transition hover:bg-surface-light"
+                                    >
+                                        {{ $game->player1->name }}
+                                    </button>
+                                    <button
+                                        wire:click="recordWalkover({{ $game->id }}, {{ $game->player2_id }})"
+                                        @click="showActionMenu = false; showWalkoverMenu = false"
+                                        class="w-full cursor-pointer rounded px-3 py-2 text-left text-sm transition hover:bg-surface-light"
+                                    >
+                                        {{ $game->player2->name }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            @endauth
+        </div>
     </div>
 
     {{-- Match Row --}}
