@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::table('tournaments', function (Blueprint $table) {
             $table->renameColumn('date', 'start_date');
-            $table->date('end_date')->nullable()->after('date');
+        });
+
+        Schema::table('tournaments', function (Blueprint $table) {
+            $table->date('end_date')->nullable()->after('start_date');
         });
     }
 
