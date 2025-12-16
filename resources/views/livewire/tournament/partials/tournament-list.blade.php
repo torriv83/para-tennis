@@ -1,36 +1,39 @@
 {{-- Tournament List for Visitors --}}
+@php
+    $today = now()->startOfDay();
+
+    // Active tournament: today is between start_date and end_date (inclusive)
+    $activeTournament = $this->allTournaments->first(function($t) use ($today) {
+        $start = $t->start_date->startOfDay();
+        $end = $t->end_date ? $t->end_date->startOfDay() : $start;
+        return $today->greaterThanOrEqualTo($start) && $today->lessThanOrEqualTo($end);
+    });
+
+    // All other tournaments are "previous"
+    $previousTournaments = $activeTournament
+        ? $this->allTournaments->filter(fn($t) => $t->id !== $activeTournament->id)
+        : $this->allTournaments;
+@endphp
+
 <div class="space-y-6">
-    {{-- Admin Create Button --}}
+    {{-- Admin Create Button - only show when no active tournament --}}
     @auth
-        <div class="flex justify-end">
-            <button
-                wire:click="newTournament"
-                class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-hover"
-            >
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                {{ __('messages.new_tournament') }}
-            </button>
-        </div>
+        @if(!$activeTournament)
+            <div class="flex justify-end">
+                <button
+                    wire:click="newTournament"
+                    class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-hover"
+                >
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    {{ __('messages.new_tournament') }}
+                </button>
+            </div>
+        @endif
     @endauth
 
     @if($this->allTournaments->count() > 0)
-        @php
-            $today = now()->startOfDay();
-
-            // Active tournament: today is between start_date and end_date (inclusive)
-            $activeTournament = $this->allTournaments->first(function($t) use ($today) {
-                $start = $t->start_date->startOfDay();
-                $end = $t->end_date ? $t->end_date->startOfDay() : $start;
-                return $today->greaterThanOrEqualTo($start) && $today->lessThanOrEqualTo($end);
-            });
-
-            // All other tournaments are "previous"
-            $previousTournaments = $activeTournament
-                ? $this->allTournaments->filter(fn($t) => $t->id !== $activeTournament->id)
-                : $this->allTournaments;
-        @endphp
 
         {{-- Active Tournament Section --}}
         @if($activeTournament)
