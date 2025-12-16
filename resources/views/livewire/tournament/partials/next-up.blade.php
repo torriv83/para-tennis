@@ -15,13 +15,13 @@
         </div>
         <div class="space-y-2">
             @foreach($this->nextUp['games'] as $game)
-                <div wire:key="nextup-{{ $game->id }}" class="flex flex-col gap-2 rounded-lg bg-surface/50 p-3 sm:flex-row sm:items-center sm:justify-between">
+                <div wire:key="nextup-{{ $game->id }}" class="flex items-center justify-between gap-2 rounded-lg bg-surface/50 p-3">
                     <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm sm:text-base">
                         <span class="font-medium">{{ $game->player1->name }}</span>
                         <span class="text-text-muted">{{ __('messages.vs') }}</span>
                         <span class="font-medium">{{ $game->player2->name }}</span>
                     </div>
-                    <span class="text-xs text-text-muted sm:text-sm">{{ localized_date($game->scheduled_at, 'time') }}</span>
+                    <span class="shrink-0 text-xs text-text-muted sm:text-sm">{{ localized_date($game->scheduled_at, 'time') }}</span>
                 </div>
             @endforeach
         </div>
