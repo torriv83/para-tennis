@@ -191,27 +191,27 @@
                 <div class="flex flex-col items-center gap-1">
                     <span class="text-xs text-text-muted">{{ __('messages.set') }} 1</span>
                     <div class="flex items-center gap-1">
-                        <input type="number" x-model.number="set1P1" min="0" max="7" class="w-10 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm">
+                        <input type="number" x-model.number="set1P1" min="0" max="7" @focus="$el.select()" class="w-10 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm">
                         <span class="text-text-muted">-</span>
-                        <input type="number" x-model.number="set1P2" min="0" max="7" class="w-10 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm">
+                        <input type="number" x-model.number="set1P2" min="0" max="7" @focus="$el.select()" class="w-10 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm">
                     </div>
                 </div>
                 {{-- Set 2 --}}
                 <div class="flex flex-col items-center gap-1">
                     <span class="text-xs text-text-muted">{{ __('messages.set') }} 2</span>
                     <div class="flex items-center gap-1">
-                        <input type="number" x-model.number="set2P1" min="0" max="7" class="w-10 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm">
+                        <input type="number" x-model.number="set2P1" min="0" max="7" @focus="$el.select()" class="w-10 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm">
                         <span class="text-text-muted">-</span>
-                        <input type="number" x-model.number="set2P2" min="0" max="7" class="w-10 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm">
+                        <input type="number" x-model.number="set2P2" min="0" max="7" @focus="$el.select()" class="w-10 rounded border border-white/20 bg-background px-1 py-1 text-center text-sm">
                     </div>
                 </div>
                 {{-- Set 3 (conditional) --}}
                 <div x-show="showSet3" class="flex flex-col items-center gap-1">
                     <span class="text-xs text-secondary">{{ __('messages.set') }} 3</span>
                     <div class="flex items-center gap-1">
-                        <input type="number" x-model.number="set3P1" min="0" class="w-10 rounded border border-secondary/50 bg-background px-1 py-1 text-center text-sm">
+                        <input type="number" x-model.number="set3P1" min="0" @focus="$el.select()" class="w-10 rounded border border-secondary/50 bg-background px-1 py-1 text-center text-sm">
                         <span class="text-text-muted">-</span>
-                        <input type="number" x-model.number="set3P2" min="0" class="w-10 rounded border border-secondary/50 bg-background px-1 py-1 text-center text-sm">
+                        <input type="number" x-model.number="set3P2" min="0" @focus="$el.select()" class="w-10 rounded border border-secondary/50 bg-background px-1 py-1 text-center text-sm">
                     </div>
                 </div>
                 {{-- Add Set 3 button --}}

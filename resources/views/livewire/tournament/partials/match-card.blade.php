@@ -46,7 +46,7 @@
                             @click="$wire.updateGameSchedule({{ $game->id }}, scheduledAt); editingSchedule = false"
                             class="cursor-pointer rounded bg-primary px-2 py-1 text-xs font-medium text-white"
                         >
-                            Save
+                            {{ __('messages.save') }}
                         </button>
                         <button
                             @click="editingSchedule = false"
