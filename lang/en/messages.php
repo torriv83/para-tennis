@@ -148,6 +148,7 @@ return [
     // Edit Modal
     'save_changes' => 'Save Changes',
     'cancel' => 'Cancel',
+    'back' => 'Back',
 
     // Round Robin short
     'round_robin_short' => 'Round Robin',

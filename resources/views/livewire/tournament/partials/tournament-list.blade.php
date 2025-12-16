@@ -20,15 +20,16 @@
     @auth
         @if(!$activeTournament)
             <div class="flex justify-end">
-                <button
-                    wire:click="newTournament"
+                <a
+                    href="{{ route('tournament.create') }}"
+                    wire:navigate
                     class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-hover"
                 >
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     {{ __('messages.new_tournament') }}
-                </button>
+                </a>
             </div>
         @endif
     @endauth

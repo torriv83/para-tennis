@@ -15,16 +15,6 @@ class Dashboard extends Component
 {
     public ?Tournament $tournament = null;
 
-    public string $tournamentName = '';
-
-    public string $startDate = '';
-
-    public string $endDate = '';
-
-    public string $tournamentFormat = 'round_robin';
-
-    public bool $hasDoubles = false;
-
     public string $newPlayerName = '';
 
     public string $activeTab = 'overview';
@@ -65,18 +55,13 @@ class Dashboard extends Component
                 'games.player1Partner',
                 'games.player2Partner',
             ]);
-        } elseif (! request()->has('new')) {
-            // Redirect to active tournament if one exists (unless ?new is set)
+        } else {
+            // Redirect to active tournament if one exists
             $activeTournament = $this->findActiveTournament();
             if ($activeTournament) {
                 $this->redirect(route('home', $activeTournament), navigate: true);
-
-                return;
             }
         }
-
-        $this->startDate = now()->format('Y-m-d');
-        $this->endDate = now()->addDays(2)->format('Y-m-d');
     }
 
     protected function findActiveTournament(): ?Tournament
@@ -87,27 +72,6 @@ class Dashboard extends Component
             ->whereDate('start_date', '<=', $today)
             ->whereDate('end_date', '>=', $today)
             ->first();
-    }
-
-    public function createTournament(): void
-    {
-        $validated = $this->validate([
-            'tournamentName' => 'required|string|max:255',
-            'startDate' => 'required|date',
-            'endDate' => 'required|date|after_or_equal:startDate',
-            'tournamentFormat' => 'required|in:round_robin,round_robin_finals',
-            'hasDoubles' => 'boolean',
-        ]);
-
-        $tournament = Tournament::create([
-            'name' => $validated['tournamentName'],
-            'start_date' => $validated['startDate'],
-            'end_date' => $validated['endDate'],
-            'format' => $validated['tournamentFormat'],
-            'has_doubles' => $validated['hasDoubles'],
-        ]);
-
-        $this->redirect(route('home', $tournament), navigate: true);
     }
 
     public function addPlayer(): void
@@ -273,11 +237,6 @@ class Dashboard extends Component
     {
         $this->editingTournament = false;
         $this->reset(['editName', 'editStartDate', 'editEndDate', 'editFormat', 'editHasDoubles']);
-    }
-
-    public function newTournament(): void
-    {
-        $this->redirect(route('home').'?new', navigate: true);
     }
 
     public function selectTournament(int $tournamentId): void
@@ -687,17 +646,6 @@ class Dashboard extends Component
     {
         return Tournament::withCount('players')
             ->with(['games' => fn ($q) => $q->select('id', 'tournament_id', 'completed', 'is_final', 'is_doubles')])
-            ->orderByDesc('start_date')
-            ->get();
-    }
-
-    #[Computed]
-    public function pastTournaments(): \Illuminate\Database\Eloquent\Collection
-    {
-        $today = now()->startOfDay();
-
-        return Tournament::withCount('players')
-            ->whereDate('end_date', '<', $today)
             ->orderByDesc('start_date')
             ->get();
     }

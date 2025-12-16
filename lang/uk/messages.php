@@ -148,6 +148,7 @@ return [
     // Edit Modal
     'save_changes' => 'Зберегти зміни',
     'cancel' => 'Скасувати',
+    'back' => 'Назад',
 
     // Round Robin short
     'round_robin_short' => 'Коловий турнір',

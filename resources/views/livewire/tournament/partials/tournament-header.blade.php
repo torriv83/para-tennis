@@ -2,15 +2,16 @@
 <div class="flex items-center justify-between rounded-xl border border-white/10 bg-surface px-2 py-2 sm:px-4 sm:py-3">
     <div class="flex min-w-0 items-center gap-2 sm:gap-4">
         {{-- Back Button --}}
-        <button
-            wire:click="newTournament"
+        <a
+            href="{{ route('home') }}"
+            wire:navigate
             class="flex shrink-0 cursor-pointer items-center gap-2 rounded-lg p-2 text-text-secondary transition hover:bg-surface-light hover:text-text-primary sm:px-3"
         >
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             <span class="hidden text-sm font-medium sm:inline">{{ __('messages.all_tournaments') }}</span>
-        </button>
+        </a>
 
         {{-- Divider --}}
         <div class="hidden h-6 w-px bg-white/10 sm:block"></div>
@@ -61,18 +62,21 @@
                         </button>
                     @endforeach
                 </div>
-                <div class="mt-2 border-t border-white/10 pt-2">
-                    <button
-                        wire:click="newTournament"
-                        @click="open = false"
-                        class="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-primary transition hover:bg-primary/10"
-                    >
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        {{ __('messages.create_new_tournament') }}
-                    </button>
-                </div>
+                @auth
+                    <div class="mt-2 border-t border-white/10 pt-2">
+                        <a
+                            href="{{ route('tournament.create') }}"
+                            wire:navigate
+                            @click="open = false"
+                            class="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-primary transition hover:bg-primary/10"
+                        >
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            {{ __('messages.create_new_tournament') }}
+                        </a>
+                    </div>
+                @endauth
             </div>
         </div>
     </div>

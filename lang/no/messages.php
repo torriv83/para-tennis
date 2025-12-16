@@ -148,6 +148,7 @@ return [
     // Edit Modal
     'save_changes' => 'Lagre endringer',
     'cancel' => 'Avbryt',
+    'back' => 'Tilbake',
 
     // Round Robin short
     'round_robin_short' => 'Round Robin',
