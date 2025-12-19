@@ -150,7 +150,7 @@
                                 </button>
                             </div>
                         </div>
-                    @else
+                    @elseif(now()->startOfDay()->between($tournament->start_date, $tournament->end_date))
                         <button
                             wire:click="generatePin"
                             @click="open = false"
