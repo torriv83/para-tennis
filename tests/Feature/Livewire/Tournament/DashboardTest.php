@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Tournament\CreateTournament;
 use App\Livewire\Tournament\Dashboard;
 use App\Models\Game;
 use App\Models\Player;
@@ -141,7 +142,7 @@ it('calculates standings correctly with walkover', function () {
 });
 
 it('can create a tournament', function () {
-    Livewire::test(Dashboard::class)
+    Livewire::test(CreateTournament::class)
         ->set('tournamentName', 'Spring Championship')
         ->set('startDate', '2025-03-01')
         ->set('endDate', '2025-03-03')
@@ -155,7 +156,7 @@ it('can create a tournament', function () {
 });
 
 it('requires tournament name for creation', function () {
-    Livewire::test(Dashboard::class)
+    Livewire::test(CreateTournament::class)
         ->set('tournamentName', '')
         ->set('startDate', '2025-03-01')
         ->set('endDate', '2025-03-03')
@@ -165,7 +166,7 @@ it('requires tournament name for creation', function () {
 });
 
 it('requires end date to be after start date', function () {
-    Livewire::test(Dashboard::class)
+    Livewire::test(CreateTournament::class)
         ->set('tournamentName', 'Test Tournament')
         ->set('startDate', '2025-03-05')
         ->set('endDate', '2025-03-01')
@@ -271,7 +272,7 @@ it('can remove player', function () {
 // Doubles Feature Tests
 
 it('can create a tournament with doubles enabled', function () {
-    Livewire::test(Dashboard::class)
+    Livewire::test(CreateTournament::class)
         ->set('tournamentName', 'Doubles Championship')
         ->set('startDate', '2025-03-01')
         ->set('endDate', '2025-03-03')

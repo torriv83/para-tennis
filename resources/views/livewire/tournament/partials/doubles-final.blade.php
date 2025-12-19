@@ -66,7 +66,7 @@
                 </div>
             </div>
             {{-- Edit button - only show when match exists, completed, and not walkover --}}
-            @auth
+            @canEditResults($tournament)
                 @if($this->doublesMatch && $this->doublesMatch->completed && !$this->doublesMatch->is_walkover)
                     <button x-show="!editing" @click="editing = true" class="cursor-pointer text-text-muted transition hover:text-primary" title="Edit result">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -74,7 +74,7 @@
                         </svg>
                     </button>
                 @endif
-            @endauth
+            @endcanEditResults
         </div>
 
         @if($this->doublesMatch)
@@ -115,7 +115,7 @@
                                 </div>
                             @endif
                         @else
-                            @auth
+                            @canEditResults($tournament)
                                 <div x-show="!editing" class="flex items-center gap-2">
                                     <button @click="editing = true" class="cursor-pointer rounded-md border border-primary/50 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary/20">
                                         {{ __('messages.enter_result') }}
@@ -135,11 +135,11 @@
                                         </div>
                                     </div>
                                 </div>
-                            @endauth
+                            @endcanEditResults
                         @endif
 
                         {{-- Score Entry Form --}}
-                        @auth
+                        @canEditResults($tournament)
                             <div x-show="editing" x-cloak class="flex flex-col gap-3" @keydown.enter="if (canSave) { $wire.updateGameResult({{ $doubles->id }}, p1Sets, p2Sets, p1Games, p2Games, [[set1P1, set1P2], [set2P1, set2P2], ...(showSet3 ? [[set3P1, set3P2]] : [])]); editing = false; }">
                                 <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
                                     <div class="flex flex-col items-center gap-1">
@@ -195,7 +195,7 @@
                                     </span>
                                 </div>
                             </div>
-                        @endauth
+                        @endcanEditResults
                     </div>
 
                     {{-- Team 2 --}}

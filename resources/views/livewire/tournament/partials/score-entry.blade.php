@@ -97,7 +97,7 @@
             <div x-show="!editing" class="flex items-center gap-2">
                 <span class="rounded-full bg-amber-500/20 px-3 py-1 font-semibold text-amber-400">W.O.</span>
                 <span class="text-sm text-text-muted">{{ $game->walkoverWinner?->name }} {{ __('messages.wins') }}</span>
-                @auth
+                @canEditResults($tournament)
                     @if($showEditButton)
                         <button
                             wire:click="clearWalkover({{ $game->id }})"
@@ -109,7 +109,7 @@
                             </svg>
                         </button>
                     @endif
-                @endauth
+                @endcanEditResults
             </div>
         @else
             <div x-show="!editing" class="flex items-center gap-2">
@@ -123,7 +123,7 @@
                         ({{ $game->player1_games }}-{{ $game->player2_games }})
                     @endif
                 </span>
-                @auth
+                @canEditResults($tournament)
                     @if($showEditButton)
                         <button @click="editing = true" class="ml-2 cursor-pointer text-text-muted transition hover:text-primary" title="Edit result">
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -131,7 +131,7 @@
                             </svg>
                         </button>
                     @endif
-                @endauth
+                @endcanEditResults
             </div>
         @endif
     @else
@@ -140,7 +140,7 @@
             <span class="{{ $scoreDisplayClass }}">0 - 0</span>
             <span class="hidden text-sm text-text-muted sm:inline">(0-0, 0-0)</span>
         </div>
-        @auth
+        @canEditResults($tournament)
             {{-- Desktop: Original buttons (mobile uses action menu in match-card) --}}
             <div x-show="!editing" class="hidden items-center gap-2 sm:flex" x-data="{ showWalkoverMenu: false }">
                 <button @click="editing = true" class="{{ $enterButtonClass }}">
@@ -180,11 +180,11 @@
                     </div>
                 @endif
             </div>
-        @endauth
+        @endcanEditResults
     @endif
 
     {{-- Score Entry Form --}}
-    @auth
+    @canEditResults($tournament)
         <div x-show="editing" x-cloak class="flex flex-col gap-3" @keydown.enter="saveResult()">
             <div class="flex flex-wrap items-center gap-2 sm:gap-4">
                 {{-- Set 1 --}}
@@ -244,5 +244,5 @@
                 </span>
             </div>
         </div>
-    @endauth
+    @endcanEditResults
 </div>

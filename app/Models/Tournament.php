@@ -20,6 +20,7 @@ class Tournament extends Model
         'end_date',
         'format',
         'has_doubles',
+        'pin',
     ];
 
     protected static function booted(): void
@@ -71,5 +72,37 @@ class Tournament extends Model
     public function games(): HasMany
     {
         return $this->hasMany(Game::class);
+    }
+
+    public function generatePin(): string
+    {
+        $this->pin = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $this->save();
+
+        return $this->pin;
+    }
+
+    public function clearPin(): void
+    {
+        $this->pin = null;
+        $this->save();
+    }
+
+    public function isPinValid(): bool
+    {
+        if (! $this->pin) {
+            return false;
+        }
+
+        return now()->startOfDay()->lte($this->end_date);
+    }
+
+    public function verifyPin(string $pin): bool
+    {
+        if (! $this->isPinValid()) {
+            return false;
+        }
+
+        return $this->pin === $pin;
     }
 }

@@ -81,8 +81,12 @@
         </div>
     </div>
 
-    {{-- Actions Menu --}}
-    @auth
+    <div class="flex items-center gap-2">
+        {{-- PIN Login for guests --}}
+        <livewire:pin-login :tournament="$tournament" />
+
+        {{-- Actions Menu --}}
+        @auth
         <div x-data="{ open: false }" class="relative">
             <button
                 @click="open = !open"
@@ -98,7 +102,7 @@
                 x-cloak
                 @click.away="open = false"
                 x-transition
-                class="absolute right-0 top-full z-50 mt-2 w-48 rounded-xl border border-white/10 bg-surface p-2 shadow-xl"
+                class="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-white/10 bg-surface p-2 shadow-xl"
             >
                 <button
                     wire:click="startEditingTournament"
@@ -110,20 +114,73 @@
                     </svg>
                     {{ __('messages.edit_tournament') }}
                 </button>
-                <button
-                    wire:click="deleteTournament"
-                    wire:confirm="{{ __('messages.delete_confirm') }}"
-                    @click="open = false"
-                    class="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-danger transition hover:bg-danger/10"
-                >
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    {{ __('messages.delete_tournament') }}
-                </button>
+
+                {{-- PIN Management --}}
+                <div class="my-2 border-t border-white/10 pt-2" x-data="{ copied: false }">
+                    <div class="px-3 py-1 text-xs font-medium uppercase tracking-wide text-text-muted">{{ __('messages.pin_code') }}</div>
+                    @if($tournament->pin && $tournament->isPinValid())
+                        <div class="flex items-center justify-between px-3 py-2">
+                            <span class="font-mono text-lg font-bold tracking-widest text-primary">{{ $tournament->pin }}</span>
+                            <div class="flex items-center gap-1">
+                                <button
+                                    @click="navigator.clipboard.writeText('{{ $tournament->pin }}'); copied = true; setTimeout(() => copied = false, 2000)"
+                                    class="cursor-pointer rounded p-1 text-text-muted transition hover:bg-surface-light hover:text-text-secondary"
+                                    :title="copied ? '{{ __('messages.copied') }}' : '{{ __('messages.copy_pin') }}'"
+                                >
+                                    <template x-if="!copied">
+                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                    </template>
+                                    <template x-if="copied">
+                                        <svg class="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </template>
+                                </button>
+                                <button
+                                    wire:click="clearPin"
+                                    @click="open = false"
+                                    class="cursor-pointer rounded p-1 text-text-muted transition hover:bg-danger/10 hover:text-danger"
+                                    title="{{ __('messages.remove_pin') }}"
+                                >
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    @else
+                        <button
+                            wire:click="generatePin"
+                            @click="open = false"
+                            class="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-secondary transition hover:bg-surface-light hover:text-text-primary"
+                        >
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                            </svg>
+                            {{ __('messages.generate_pin') }}
+                        </button>
+                    @endif
+                </div>
+
+                <div class="border-t border-white/10 pt-2">
+                    <button
+                        wire:click="deleteTournament"
+                        wire:confirm="{{ __('messages.delete_confirm') }}"
+                        @click="open = false"
+                        class="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-danger transition hover:bg-danger/10"
+                    >
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        {{ __('messages.delete_tournament') }}
+                    </button>
+                </div>
             </div>
         </div>
-    @endauth
+        @endauth
+    </div>
 </div>
 
 {{-- Tournament Info Header --}}

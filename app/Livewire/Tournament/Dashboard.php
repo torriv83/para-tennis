@@ -202,6 +202,17 @@ class Dashboard extends Component
         $this->tournament = null;
     }
 
+    public function generatePin(): void
+    {
+        $pin = $this->tournament->generatePin();
+        $this->dispatch('pin-generated', pin: $pin);
+    }
+
+    public function clearPin(): void
+    {
+        $this->tournament->clearPin();
+    }
+
     public function startEditingTournament(): void
     {
         $this->editName = $this->tournament->name;

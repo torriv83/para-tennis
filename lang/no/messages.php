@@ -159,4 +159,20 @@ return [
     'norwegian' => 'Norsk',
     'english' => 'English',
     'ukrainian' => 'Українська',
+
+    // PIN
+    'pin_code' => 'PIN-kode',
+    'generate_pin' => 'Generer PIN',
+    'remove_pin' => 'Fjern PIN',
+    'enter_pin' => 'Skriv inn PIN',
+    'enter_pin_description' => 'Skriv inn PIN-koden for å registrere resultater',
+    'pin_placeholder' => '000000',
+    'verify_pin' => 'Bekreft',
+    'invalid_pin' => 'Ugyldig PIN-kode',
+    'pin_expired' => 'PIN-koden er utløpt',
+    'pin_access' => 'PIN-tilgang',
+    'logout_pin' => 'Logg ut',
+    'pin_generated' => 'PIN generert',
+    'copy_pin' => 'Kopier PIN',
+    'copied' => 'Kopiert!',
 ];

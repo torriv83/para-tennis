@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\PinAuthService;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(PinAuthService::class);
     }
 
     /**
@@ -19,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Blade::if('canEditResults', function ($tournament) {
+            return app(PinAuthService::class)->canEditResults($tournament);
+        });
     }
 }

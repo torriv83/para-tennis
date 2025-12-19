@@ -159,4 +159,20 @@ return [
     'norwegian' => 'Norsk',
     'english' => 'English',
     'ukrainian' => 'Українська',
+
+    // PIN
+    'pin_code' => 'PIN Code',
+    'generate_pin' => 'Generate PIN',
+    'remove_pin' => 'Remove PIN',
+    'enter_pin' => 'Enter PIN',
+    'enter_pin_description' => 'Enter the PIN code to record results',
+    'pin_placeholder' => '000000',
+    'verify_pin' => 'Verify',
+    'invalid_pin' => 'Invalid PIN code',
+    'pin_expired' => 'PIN code has expired',
+    'pin_access' => 'PIN Access',
+    'logout_pin' => 'Log out',
+    'pin_generated' => 'PIN Generated',
+    'copy_pin' => 'Copy PIN',
+    'copied' => 'Copied!',
 ];

@@ -18,7 +18,7 @@
             <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            @auth
+            @canEditResults($tournament)
                 <template x-if="!editingSchedule">
                     <span
                         @click="editingSchedule = true"
@@ -66,7 +66,7 @@
                         -
                     @endif
                 </span>
-            @endauth
+            @endcanEditResults
         </div>
         <div class="flex items-center gap-2">
             @if($game->completed)
@@ -78,7 +78,7 @@
             @endif
 
             {{-- Mobile: Action menu (only for incomplete matches) --}}
-            @auth
+            @canEditResults($tournament)
                 @if(!$game->completed)
                     <div class="relative sm:hidden">
                         <button
@@ -141,7 +141,7 @@
                         </div>
                     </div>
                 @endif
-            @endauth
+            @endcanEditResults
         </div>
     </div>
 
@@ -151,7 +151,7 @@
             <span class="text-sm sm:text-base {{ $game->completed && $game->player1_sets > $game->player2_sets ? 'font-semibold text-success' : '' }}">
                 {{ $game->player1->name }}
             </span>
-            @auth
+            @canEditResults($tournament)
                 <button
                     wire:click="swapPlayers({{ $game->id }})"
                     class="cursor-pointer rounded p-1 text-text-muted transition hover:bg-surface hover:text-text-secondary"
@@ -161,7 +161,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                     </svg>
                 </button>
-            @endauth
+            @endcanEditResults
         </div>
 
         @include('livewire.tournament.partials.score-entry', ['game' => $game, 'variant' => 'default'])

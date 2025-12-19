@@ -159,4 +159,20 @@ return [
     'norwegian' => 'Norsk',
     'english' => 'English',
     'ukrainian' => 'Українська',
+
+    // PIN
+    'pin_code' => 'PIN-код',
+    'generate_pin' => 'Створити PIN',
+    'remove_pin' => 'Видалити PIN',
+    'enter_pin' => 'Введіть PIN',
+    'enter_pin_description' => 'Введіть PIN-код для запису результатів',
+    'pin_placeholder' => '000000',
+    'verify_pin' => 'Підтвердити',
+    'invalid_pin' => 'Невірний PIN-код',
+    'pin_expired' => 'PIN-код закінчився',
+    'pin_access' => 'PIN-доступ',
+    'logout_pin' => 'Вийти',
+    'pin_generated' => 'PIN створено',
+    'copy_pin' => 'Копіювати PIN',
+    'copied' => 'Скопійовано!',
 ];
