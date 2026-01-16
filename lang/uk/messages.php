@@ -88,6 +88,9 @@ return [
     'beat' => 'Перемогти',
     'lose_to' => 'Програти',
     'player_beats_player' => ':winner перемагає :loser',
+    'or_win_with_games' => 'виграти з перевагою +:games геймів',
+    'win_21_under_games' => 'Виграти 2-1 з перевагою менше +:games геймів',
+    'or' => 'або',
 
     // Finals
     'championship_final' => 'Фінал чемпіонату',

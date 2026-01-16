@@ -88,6 +88,9 @@ return [
     'beat' => 'Slå',
     'lose_to' => 'Tap mot',
     'player_beats_player' => ':winner slår :loser',
+    'or_win_with_games' => 'vinn med +:games games margin',
+    'win_21_under_games' => 'Vinn 2-1 med under +:games games margin',
+    'or' => 'eller',
 
     // Finals
     'championship_final' => 'Mesterskapsfinale',

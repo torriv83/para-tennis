@@ -26,6 +26,11 @@ class PredictionService
             return $this->getFinalStandingsPredictions();
         }
 
+        // Special handling for last game - can provide precise game-diff thresholds
+        if ($incompleteGames->count() === 1) {
+            return $this->getLastGamePredictions($incompleteGames->first());
+        }
+
         $scenarios = $this->generateAllScenarios($incompleteGames);
         $playerPredictions = [];
 
@@ -625,5 +630,382 @@ class PredictionService
             3 => __('messages.position_3rd'),
             default => __('messages.position_nth', ['n' => $position]),
         };
+    }
+
+    /**
+     * Special predictions for last game - includes precise game-diff thresholds.
+     */
+    protected function getLastGamePredictions($lastGame): array
+    {
+        $player1 = $this->tournament->players->find($lastGame->player1_id);
+        $player2 = $this->tournament->players->find($lastGame->player2_id);
+
+        // Get current standings (without last game) and normalize structure
+        $rawStandings = $this->standingsService->calculate();
+        $currentStandings = collect($rawStandings)->map(function ($standing) {
+            return [
+                'player_id' => $standing['player']->id,
+                'player_name' => $standing['player']->name,
+                'points' => $standing['points'],
+                'wins' => $standing['wins'],
+                'losses' => $standing['losses'],
+                'sets_won' => $standing['sets_won'],
+                'sets_lost' => $standing['sets_lost'],
+                'set_difference' => $standing['sets_won'] - $standing['sets_lost'],
+                'games_won' => $standing['games_won'],
+                'games_lost' => $standing['games_lost'],
+                'game_difference' => $standing['games_won'] - $standing['games_lost'],
+            ];
+        })->values()->toArray();
+
+        // Get current stats for both players
+        $p1Stats = collect($currentStandings)->firstWhere('player_id', $player1->id);
+        $p2Stats = collect($currentStandings)->firstWhere('player_id', $player2->id);
+
+        $predictions = [];
+
+        // Generate predictions for both players in the last game
+        foreach ([$player1, $player2] as $player) {
+            $isPlayer1 = $player->id === $player1->id;
+            $opponent = $isPlayer1 ? $player2 : $player1;
+            $playerStats = $isPlayer1 ? $p1Stats : $p2Stats;
+
+            $predictions[$player->id] = $this->analyzeLastGameForPlayer(
+                $player,
+                $opponent,
+                $playerStats,
+                $currentStandings,
+                $isPlayer1
+            );
+        }
+
+        // For players NOT in the last game, they're just waiting on results
+        foreach ($this->tournament->players as $player) {
+            if (isset($predictions[$player->id])) {
+                continue;
+            }
+
+            // Simulate all outcomes to find best/worst
+            $positions = $this->simulateAllOutcomesForWaitingPlayer($player->id, $player1, $player2, $currentStandings);
+
+            $predictions[$player->id] = [
+                'best_position' => min($positions),
+                'worst_position' => max($positions),
+                'clinched' => min($positions) === max($positions),
+                'summary' => min($positions) === max($positions)
+                    ? __('messages.clinched_position', ['position' => $this->getPositionLabel(min($positions))])
+                    : __('messages.waiting_on_results', [
+                        'best' => $this->getPositionLabel(min($positions)),
+                        'worst' => $this->getPositionLabel(max($positions)),
+                    ]),
+                'scenarios' => [],
+            ];
+        }
+
+        return $predictions;
+    }
+
+    protected function analyzeLastGameForPlayer($player, $opponent, $playerStats, $currentStandings, bool $isPlayer1): array
+    {
+        // Possible outcomes: 2-0, 2-1, 1-2, 0-2 (from player's perspective)
+        $outcomes = [
+            ['sets_won' => 2, 'sets_lost' => 0, 'games_won' => 12, 'games_lost' => 4, 'label' => '2-0'],
+            ['sets_won' => 2, 'sets_lost' => 1, 'games_won' => 14, 'games_lost' => 10, 'label' => '2-1'],
+            ['sets_won' => 1, 'sets_lost' => 2, 'games_won' => 10, 'games_lost' => 14, 'label' => '1-2'],
+            ['sets_won' => 0, 'sets_lost' => 2, 'games_won' => 4, 'games_lost' => 12, 'label' => '0-2'],
+        ];
+
+        $scenarioResults = [];
+
+        foreach ($outcomes as $outcome) {
+            $position = $this->calculatePositionWithOutcome(
+                $player->id,
+                $opponent->id,
+                $outcome,
+                $currentStandings,
+                $isPlayer1
+            );
+            $scenarioResults[] = [
+                'outcome' => $outcome,
+                'position' => $position,
+            ];
+        }
+
+        $positions = array_column($scenarioResults, 'position');
+        $bestPosition = min($positions);
+        $worstPosition = max($positions);
+
+        // Build detailed scenarios with game-diff thresholds
+        $scenarios = $this->buildLastGameScenarios($player, $opponent, $scenarioResults, $currentStandings);
+
+        return [
+            'best_position' => $bestPosition,
+            'worst_position' => $worstPosition,
+            'clinched' => $bestPosition === $worstPosition,
+            'summary' => $bestPosition === $worstPosition
+                ? __('messages.clinched_position', ['position' => $this->getPositionLabel($bestPosition)])
+                : __('messages.can_finish_range', [
+                    'best' => $this->getPositionLabel($bestPosition),
+                    'worst' => $this->getPositionLabel($worstPosition),
+                ]),
+            'scenarios' => $scenarios,
+        ];
+    }
+
+    protected function calculatePositionWithOutcome(int $playerId, int $opponentId, array $outcome, $currentStandings, bool $isPlayer1): int
+    {
+        // Create modified standings with the outcome applied
+        $modifiedStandings = collect($currentStandings)->map(function ($standing) use ($playerId, $opponentId, $outcome) {
+            $newStanding = $standing;
+
+            if ($standing['player_id'] === $playerId) {
+                // This player's outcome
+                $won = $outcome['sets_won'] > $outcome['sets_lost'];
+                $newStanding['points'] = $standing['points'] + ($won ? 2 : 0);
+                $newStanding['sets_won'] = $standing['sets_won'] + $outcome['sets_won'];
+                $newStanding['sets_lost'] = $standing['sets_lost'] + $outcome['sets_lost'];
+                $newStanding['set_difference'] = $newStanding['sets_won'] - $newStanding['sets_lost'];
+                $newStanding['games_won'] = $standing['games_won'] + $outcome['games_won'];
+                $newStanding['games_lost'] = $standing['games_lost'] + $outcome['games_lost'];
+                $newStanding['game_difference'] = $newStanding['games_won'] - $newStanding['games_lost'];
+            } elseif ($standing['player_id'] === $opponentId) {
+                // Opponent's inverse outcome
+                $opponentWon = $outcome['sets_lost'] > $outcome['sets_won'];
+                $newStanding['points'] = $standing['points'] + ($opponentWon ? 2 : 0);
+                $newStanding['sets_won'] = $standing['sets_won'] + $outcome['sets_lost'];
+                $newStanding['sets_lost'] = $standing['sets_lost'] + $outcome['sets_won'];
+                $newStanding['set_difference'] = $newStanding['sets_won'] - $newStanding['sets_lost'];
+                $newStanding['games_won'] = $standing['games_won'] + $outcome['games_lost'];
+                $newStanding['games_lost'] = $standing['games_lost'] + $outcome['games_won'];
+                $newStanding['game_difference'] = $newStanding['games_won'] - $newStanding['games_lost'];
+            }
+
+            return $newStanding;
+        })->toArray();
+
+        // Sort by points, then set_difference, then game_difference
+        usort($modifiedStandings, function ($a, $b) {
+            if ($a['points'] !== $b['points']) {
+                return $b['points'] - $a['points'];
+            }
+            if ($a['set_difference'] !== $b['set_difference']) {
+                return $b['set_difference'] - $a['set_difference'];
+            }
+
+            return $b['game_difference'] - $a['game_difference'];
+        });
+
+        // Find player's position
+        foreach ($modifiedStandings as $index => $standing) {
+            if ($standing['player_id'] === $playerId) {
+                return $index + 1;
+            }
+        }
+
+        return count($modifiedStandings);
+    }
+
+    protected function buildLastGameScenarios($player, $opponent, array $scenarioResults, $currentStandings): array
+    {
+        $scenarios = [];
+        $byPosition = [];
+
+        // Group by position
+        foreach ($scenarioResults as $result) {
+            $pos = $result['position'];
+            if (! isset($byPosition[$pos])) {
+                $byPosition[$pos] = [];
+            }
+            $byPosition[$pos][] = $result;
+        }
+
+        ksort($byPosition);
+
+        // First, calculate game threshold to use in scenario building
+        $gameThresholdForBestPosition = $this->calculateGameDiffThreshold(
+            $player->id,
+            $opponent->id,
+            min(array_keys($byPosition)),
+            $currentStandings,
+            $scenarioResults
+        );
+
+        foreach ($byPosition as $position => $results) {
+            $outcomes = array_column($results, 'outcome');
+            $winOutcomes = array_filter($outcomes, fn ($o) => $o['sets_won'] > $o['sets_lost']);
+            $loseOutcomes = array_filter($outcomes, fn ($o) => $o['sets_won'] < $o['sets_lost']);
+
+            $conditions = [];
+
+            if (count($winOutcomes) === 2) {
+                // Both win outcomes (2-0 and 2-1) give this position
+                $conditions[] = __('messages.beat').' '.$opponent->name;
+            } elseif (count($winOutcomes) === 1) {
+                $outcome = reset($winOutcomes);
+
+                if ($outcome['label'] === '2-0' && $gameThresholdForBestPosition !== null) {
+                    // Best position: 2-0 OR win with enough games margin
+                    $conditions[] = __('messages.beat').' '.$opponent->name.' 2-0';
+                    $conditions[] = __('messages.or_win_with_games', ['games' => $gameThresholdForBestPosition]);
+                } elseif ($outcome['label'] === '2-1' && $gameThresholdForBestPosition !== null) {
+                    // Worse position: 2-1 with INSUFFICIENT games margin
+                    $conditions[] = __('messages.win_21_under_games', ['games' => $gameThresholdForBestPosition]);
+                } else {
+                    // No game threshold applies
+                    $conditions[] = __('messages.beat').' '.$opponent->name.' '.$outcome['label'];
+                }
+            }
+
+            if (count($loseOutcomes) === 2) {
+                // Both lose outcomes give this position
+                $conditions[] = __('messages.lose_to').' '.$opponent->name;
+            } elseif (count($loseOutcomes) === 1) {
+                // Only one lose outcome gives this position
+                $outcome = reset($loseOutcomes);
+                $conditions[] = __('messages.lose_to').' '.$opponent->name.' '.$outcome['label'];
+            }
+
+            if (! empty($conditions)) {
+                $scenarios[] = [
+                    'position' => $position,
+                    'position_label' => $this->getPositionLabel($position),
+                    'conditions' => implode(' '.__('messages.or').' ', $conditions),
+                    'external_conditions' => '',
+                    'count' => count($results),
+                ];
+            }
+        }
+
+        return $scenarios;
+    }
+
+    protected function calculateGameDiffThreshold(int $playerId, int $opponentId, int $targetPosition, $currentStandings, array $scenarioResults): ?int
+    {
+        $playerCurrentStats = collect($currentStandings)->firstWhere('player_id', $playerId);
+        $opponentCurrentStats = collect($currentStandings)->firstWhere('player_id', $opponentId);
+
+        $winBy20 = collect($scenarioResults)->first(fn ($r) => $r['outcome']['label'] === '2-0');
+        $winBy21 = collect($scenarioResults)->first(fn ($r) => $r['outcome']['label'] === '2-1');
+
+        if (! $winBy20 || ! $winBy21) {
+            return null;
+        }
+
+        if ($winBy20['position'] === $winBy21['position']) {
+            return null;
+        }
+
+        // Only show games threshold for the BETTER position (what 2-0 gives)
+        // It doesn't make sense for the worse position
+        if ($targetPosition !== $winBy20['position']) {
+            return null;
+        }
+
+        // Calculate set-diffs after a 2-1 win
+        $playerSetDiffAfter21 = $playerCurrentStats['set_difference'] + 1; // 2-1 gives +1 net set
+        $opponentSetDiffAfter21Loss = $opponentCurrentStats['set_difference'] - 1; // Opponent loses 1 net set
+
+        // If opponent still has better set-diff after losing 1-2, game-threshold is irrelevant
+        // The opponent will always be ahead on set-diff tiebreaker
+        if ($opponentSetDiffAfter21Loss > $playerSetDiffAfter21) {
+            return null;
+        }
+
+        // Find competitors (not in this game) with same or better set-diff who could block us
+        foreach ($currentStandings as $competitor) {
+            if ($competitor['player_id'] === $playerId || $competitor['player_id'] === $opponentId) {
+                continue;
+            }
+
+            // Check if this competitor would have same set-diff as us after our 2-1 win
+            // (competitors not in this game keep their current set-diff)
+            if ($competitor['set_difference'] === $playerSetDiffAfter21) {
+                // We'd be tied on sets, game-diff decides
+                // Calculate minimum games needed to beat this competitor
+                $competitorGames = $competitor['game_difference'];
+                $playerCurrentGames = $playerCurrentStats['game_difference'];
+
+                // We need: playerCurrentGames + X > competitorGames
+                // So: X > competitorGames - playerCurrentGames
+                $threshold = $competitorGames - $playerCurrentGames + 1;
+
+                // Return threshold if meaningful (player needs positive games margin to beat competitor)
+                if ($threshold > 0) {
+                    return $threshold;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    protected function getPositionFromStandings(int $playerId, $standings): int
+    {
+        foreach ($standings as $index => $standing) {
+            if ($standing['player_id'] === $playerId) {
+                return $index + 1;
+            }
+        }
+
+        return count($standings);
+    }
+
+    protected function simulateAllOutcomesForWaitingPlayer(int $playerId, $player1, $player2, $currentStandings): array
+    {
+        $positions = [];
+        $outcomes = [
+            ['p1_sets' => 2, 'p2_sets' => 0, 'p1_games' => 12, 'p2_games' => 4],
+            ['p1_sets' => 2, 'p2_sets' => 1, 'p1_games' => 14, 'p2_games' => 10],
+            ['p1_sets' => 1, 'p2_sets' => 2, 'p1_games' => 10, 'p2_games' => 14],
+            ['p1_sets' => 0, 'p2_sets' => 2, 'p1_games' => 4, 'p2_games' => 12],
+        ];
+
+        foreach ($outcomes as $outcome) {
+            $modifiedStandings = collect($currentStandings)->map(function ($standing) use ($player1, $player2, $outcome) {
+                $newStanding = $standing;
+
+                if ($standing['player_id'] === $player1->id) {
+                    $won = $outcome['p1_sets'] > $outcome['p2_sets'];
+                    $newStanding['points'] = $standing['points'] + ($won ? 2 : 0);
+                    $newStanding['sets_won'] = $standing['sets_won'] + $outcome['p1_sets'];
+                    $newStanding['sets_lost'] = $standing['sets_lost'] + $outcome['p2_sets'];
+                    $newStanding['set_difference'] = $newStanding['sets_won'] - $newStanding['sets_lost'];
+                    $newStanding['games_won'] = $standing['games_won'] + $outcome['p1_games'];
+                    $newStanding['games_lost'] = $standing['games_lost'] + $outcome['p2_games'];
+                    $newStanding['game_difference'] = $newStanding['games_won'] - $newStanding['games_lost'];
+                } elseif ($standing['player_id'] === $player2->id) {
+                    $won = $outcome['p2_sets'] > $outcome['p1_sets'];
+                    $newStanding['points'] = $standing['points'] + ($won ? 2 : 0);
+                    $newStanding['sets_won'] = $standing['sets_won'] + $outcome['p2_sets'];
+                    $newStanding['sets_lost'] = $standing['sets_lost'] + $outcome['p1_sets'];
+                    $newStanding['set_difference'] = $newStanding['sets_won'] - $newStanding['sets_lost'];
+                    $newStanding['games_won'] = $standing['games_won'] + $outcome['p2_games'];
+                    $newStanding['games_lost'] = $standing['games_lost'] + $outcome['p1_games'];
+                    $newStanding['game_difference'] = $newStanding['games_won'] - $newStanding['games_lost'];
+                }
+
+                return $newStanding;
+            })->toArray();
+
+            usort($modifiedStandings, function ($a, $b) {
+                if ($a['points'] !== $b['points']) {
+                    return $b['points'] - $a['points'];
+                }
+                if ($a['set_difference'] !== $b['set_difference']) {
+                    return $b['set_difference'] - $a['set_difference'];
+                }
+
+                return $b['game_difference'] - $a['game_difference'];
+            });
+
+            foreach ($modifiedStandings as $index => $standing) {
+                if ($standing['player_id'] === $playerId) {
+                    $positions[] = $index + 1;
+                    break;
+                }
+            }
+        }
+
+        return $positions;
     }
 }

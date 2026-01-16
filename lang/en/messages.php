@@ -88,6 +88,9 @@ return [
     'beat' => 'Beat',
     'lose_to' => 'Lose to',
     'player_beats_player' => ':winner beats :loser',
+    'or_win_with_games' => 'win by +:games games margin',
+    'win_21_under_games' => 'Win 2-1 with under +:games games margin',
+    'or' => 'or',
 
     // Finals
     'championship_final' => 'Championship Final',
