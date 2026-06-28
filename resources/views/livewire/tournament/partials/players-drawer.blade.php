@@ -53,19 +53,46 @@
                     @if($tournament->players->count() > 0)
                         <ul class="space-y-2">
                             @foreach($tournament->players as $player)
-                                <li wire:key="drawer-player-{{ $player->id }}" class="flex items-center justify-between rounded-lg border border-white/5 bg-surface-light px-4 py-3">
-                                    <span>{{ $player->name }}</span>
+                                <li wire:key="drawer-player-{{ $player->id }}" class="flex flex-col gap-2 rounded-lg border border-white/5 bg-surface-light px-4 py-3">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="min-w-0 truncate">{{ $player->name }}</span>
+                                        @auth
+                                            @if($tournament->games->isEmpty())
+                                                <button
+                                                    wire:click="removePlayer({{ $player->id }})"
+                                                    class="shrink-0 cursor-pointer text-text-muted transition hover:text-danger"
+                                                >
+                                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            @endif
+                                        @endauth
+                                    </div>
                                     @auth
-                                        @if($tournament->games->isEmpty())
+                                        <div class="flex flex-wrap gap-2">
                                             <button
-                                                wire:click="removePlayer({{ $player->id }})"
-                                                class="cursor-pointer text-text-muted transition hover:text-danger"
+                                                wire:click="setPlayerParticipation({{ $player->id }}, {{ $player->plays_singles ? 'false' : 'true' }}, {{ $player->plays_doubles ? 'true' : 'false' }})"
+                                                class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition {{ $player->plays_singles ? 'border-primary bg-primary/15 text-primary' : 'border-white/15 text-text-muted hover:border-white/30' }}"
                                             >
-                                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
+                                                {{ __('messages.singles') }}
                                             </button>
-                                        @endif
+                                            <button
+                                                wire:click="setPlayerParticipation({{ $player->id }}, {{ $player->plays_singles ? 'true' : 'false' }}, {{ $player->plays_doubles ? 'false' : 'true' }})"
+                                                class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition {{ $player->plays_doubles ? 'border-secondary bg-secondary/15 text-secondary' : 'border-white/15 text-text-muted hover:border-white/30' }}"
+                                            >
+                                                {{ __('messages.doubles') }}
+                                            </button>
+                                        </div>
+                                    @else
+                                        <div class="flex flex-wrap gap-2">
+                                            @if($player->plays_singles)
+                                                <span class="rounded-full bg-primary/15 px-3 py-1 text-xs font-medium text-primary">{{ __('messages.singles') }}</span>
+                                            @endif
+                                            @if($player->plays_doubles)
+                                                <span class="rounded-full bg-secondary/15 px-3 py-1 text-xs font-medium text-secondary">{{ __('messages.doubles') }}</span>
+                                            @endif
+                                        </div>
                                     @endauth
                                 </li>
                             @endforeach
@@ -79,19 +106,40 @@
                     {{-- Add New Player --}}
                     <div>
                         <h4 class="mb-3 text-sm font-medium uppercase tracking-wide text-text-muted">{{ __('messages.add_new_player') }}</h4>
-                        <form wire:submit="{{ $tournament->games->isEmpty() ? 'addPlayer' : 'addPlayerAndUpdateSchedule' }}" class="flex gap-2">
-                            <input
-                                type="text"
-                                wire:model="newPlayerName"
-                                class="flex-1 rounded-lg border border-white/10 bg-background px-4 py-2 text-text-primary placeholder-text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                placeholder="{{ __('messages.player_name_placeholder') }}"
-                            >
-                            <button
-                                type="submit"
-                                class="cursor-pointer rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-hover"
-                            >
-                                {{ __('messages.add') }}
-                            </button>
+                        <form wire:submit="{{ $tournament->games->isEmpty() ? 'addPlayer' : 'addPlayerAndUpdateSchedule' }}" class="space-y-3">
+                            <div class="flex gap-2">
+                                <input
+                                    type="text"
+                                    wire:model="newPlayerName"
+                                    class="flex-1 rounded-lg border border-white/10 bg-background px-4 py-2 text-text-primary placeholder-text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    placeholder="{{ __('messages.player_name_placeholder') }}"
+                                >
+                                <button
+                                    type="submit"
+                                    class="cursor-pointer rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-hover"
+                                >
+                                    {{ __('messages.add') }}
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap gap-4">
+                                <label class="flex cursor-pointer items-center gap-2 text-sm">
+                                    <input
+                                        type="checkbox"
+                                        wire:model="newPlayerPlaysSingles"
+                                        class="h-4 w-4 cursor-pointer rounded border-white/20 bg-background text-primary focus:ring-primary/20"
+                                    >
+                                    {{ __('messages.singles') }}
+                                </label>
+                                <label class="flex cursor-pointer items-center gap-2 text-sm">
+                                    <input
+                                        type="checkbox"
+                                        wire:model="newPlayerPlaysDoubles"
+                                        class="h-4 w-4 cursor-pointer rounded border-white/20 bg-background text-secondary focus:ring-secondary/20"
+                                    >
+                                    {{ __('messages.doubles') }}
+                                </label>
+                            </div>
+                            @error('newPlayerName') <span class="block text-sm text-danger">{{ $message }}</span> @enderror
                         </form>
                     </div>
 

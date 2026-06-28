@@ -29,7 +29,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     /* Accent Colors */
     --color-primary: #FF793F;
     --color-primary-hover: #FF8F5A;
-    --color-secondary: #C387FF;
+    --color-secondary: #38BDF8;
 
     /* Semantic Colors */
     --color-success: #4ADE80;

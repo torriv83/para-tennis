@@ -20,6 +20,7 @@ class Tournament extends Model
         'end_date',
         'format',
         'has_doubles',
+        'doubles_format',
         'pin',
     ];
 
@@ -60,6 +61,7 @@ class Tournament extends Model
             'start_date' => 'date',
             'end_date' => 'date',
             'format' => TournamentFormat::class,
+            'doubles_format' => TournamentFormat::class,
             'has_doubles' => 'boolean',
         ];
     }
@@ -72,6 +74,11 @@ class Tournament extends Model
     public function games(): HasMany
     {
         return $this->hasMany(Game::class);
+    }
+
+    public function teams(): HasMany
+    {
+        return $this->hasMany(Team::class);
     }
 
     public function generatePin(): string

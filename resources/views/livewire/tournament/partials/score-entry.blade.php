@@ -96,7 +96,7 @@
         @if($game->is_walkover)
             <div x-show="!editing" class="flex items-center gap-2">
                 <span class="rounded-full bg-amber-500/20 px-3 py-1 font-semibold text-amber-400">W.O.</span>
-                <span class="text-sm text-text-muted">{{ $game->walkoverWinner?->name }} {{ __('messages.wins') }}</span>
+                <span class="text-sm text-text-muted">{{ $game->is_doubles ? $game->walkoverWinnerTeam?->displayName() : $game->walkoverWinner?->name }} {{ __('messages.wins') }}</span>
                 @canEditResults($tournament)
                     @if($showEditButton)
                         <button
@@ -161,21 +161,38 @@
                             @click.away="showWalkoverMenu = false"
                             class="absolute right-0 top-full z-10 mt-2 w-48 rounded-lg border border-white/10 bg-surface p-2 shadow-xl"
                         >
-                            <p class="mb-2 px-2 text-xs text-text-muted">{{ __('messages.select_winner') }}</p>
-                            <button
-                                wire:click="recordWalkover({{ $game->id }}, {{ $game->player1_id }})"
-                                @click="showWalkoverMenu = false"
-                                class="w-full cursor-pointer rounded px-3 py-2 text-left text-sm transition hover:bg-surface-light"
-                            >
-                                {{ $game->player1->name }}
-                            </button>
-                            <button
-                                wire:click="recordWalkover({{ $game->id }}, {{ $game->player2_id }})"
-                                @click="showWalkoverMenu = false"
-                                class="w-full cursor-pointer rounded px-3 py-2 text-left text-sm transition hover:bg-surface-light"
-                            >
-                                {{ $game->player2->name }}
-                            </button>
+                            <p class="mb-2 px-2 text-xs text-text-muted">{{ $game->is_doubles ? __('messages.select_winning_team') : __('messages.select_winner') }}</p>
+                            @if($game->is_doubles)
+                                <button
+                                    wire:click="recordDoublesWalkover({{ $game->id }}, {{ $game->team1_id }})"
+                                    @click="showWalkoverMenu = false"
+                                    class="w-full cursor-pointer rounded px-3 py-2 text-left text-sm transition hover:bg-surface-light"
+                                >
+                                    {{ $game->team1Names() }}
+                                </button>
+                                <button
+                                    wire:click="recordDoublesWalkover({{ $game->id }}, {{ $game->team2_id }})"
+                                    @click="showWalkoverMenu = false"
+                                    class="w-full cursor-pointer rounded px-3 py-2 text-left text-sm transition hover:bg-surface-light"
+                                >
+                                    {{ $game->team2Names() }}
+                                </button>
+                            @else
+                                <button
+                                    wire:click="recordWalkover({{ $game->id }}, {{ $game->player1_id }})"
+                                    @click="showWalkoverMenu = false"
+                                    class="w-full cursor-pointer rounded px-3 py-2 text-left text-sm transition hover:bg-surface-light"
+                                >
+                                    {{ $game->player1->name }}
+                                </button>
+                                <button
+                                    wire:click="recordWalkover({{ $game->id }}, {{ $game->player2_id }})"
+                                    @click="showWalkoverMenu = false"
+                                    class="w-full cursor-pointer rounded px-3 py-2 text-left text-sm transition hover:bg-surface-light"
+                                >
+                                    {{ $game->player2->name }}
+                                </button>
+                            @endif
                         </div>
                     </div>
                 @endif

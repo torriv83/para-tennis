@@ -15,7 +15,22 @@ class Player extends Model
     protected $fillable = [
         'tournament_id',
         'name',
+        'plays_singles',
+        'plays_doubles',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'plays_singles' => 'boolean',
+            'plays_doubles' => 'boolean',
+        ];
+    }
+
+    public function displayName(): string
+    {
+        return $this->name ?? '';
+    }
 
     public function tournament(): BelongsTo
     {

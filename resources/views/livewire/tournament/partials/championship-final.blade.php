@@ -83,7 +83,7 @@
             <div class="rounded-lg border border-dashed border-white/20 bg-surface/50 p-4 text-center">
                 <p class="text-text-muted">{{ __('messages.complete_round_robin') }}</p>
                 @php
-                    $roundRobinGames = $tournament->games->where('is_final', false);
+                    $roundRobinGames = $tournament->games->where('is_final', false)->where('is_doubles', false);
                     $completedCount = $roundRobinGames->where('completed', true)->count();
                     $totalCount = $roundRobinGames->count();
                 @endphp

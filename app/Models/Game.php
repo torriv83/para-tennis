@@ -14,9 +14,7 @@ class Game extends Model
     protected $fillable = [
         'tournament_id',
         'player1_id',
-        'player1_partner_id',
         'player2_id',
-        'player2_partner_id',
         'scheduled_at',
         'player1_sets',
         'player2_sets',
@@ -25,9 +23,12 @@ class Game extends Model
         'set_scores',
         'is_final',
         'is_doubles',
+        'team1_id',
+        'team2_id',
         'completed',
         'is_walkover',
         'walkover_winner_id',
+        'walkover_winner_team_id',
     ];
 
     protected function casts(): array
@@ -62,32 +63,33 @@ class Game extends Model
         return $this->belongsTo(Player::class, 'walkover_winner_id');
     }
 
-    public function player1Partner(): BelongsTo
+    public function team1(): BelongsTo
     {
-        return $this->belongsTo(Player::class, 'player1_partner_id');
+        return $this->belongsTo(Team::class, 'team1_id');
     }
 
-    public function player2Partner(): BelongsTo
+    public function team2(): BelongsTo
     {
-        return $this->belongsTo(Player::class, 'player2_partner_id');
+        return $this->belongsTo(Team::class, 'team2_id');
+    }
+
+    public function walkoverWinnerTeam(): BelongsTo
+    {
+        return $this->belongsTo(Team::class, 'walkover_winner_team_id');
     }
 
     public function team1Names(): string
     {
-        if (! $this->is_doubles) {
-            return $this->player1?->name ?? '';
-        }
-
-        return $this->player1?->name.' & '.$this->player1Partner?->name;
+        return $this->is_doubles
+            ? ($this->team1?->displayName() ?? '')
+            : ($this->player1?->name ?? '');
     }
 
     public function team2Names(): string
     {
-        if (! $this->is_doubles) {
-            return $this->player2?->name ?? '';
-        }
-
-        return $this->player2?->name.' & '.$this->player2Partner?->name;
+        return $this->is_doubles
+            ? ($this->team2?->displayName() ?? '')
+            : ($this->player2?->name ?? '');
     }
 
     public function winner(): ?Player
@@ -120,5 +122,37 @@ class Game extends Model
         return $this->player1_sets < $this->player2_sets
             ? $this->player1
             : $this->player2;
+    }
+
+    public function winningTeam(): ?Team
+    {
+        if (! $this->completed || ! $this->is_doubles) {
+            return null;
+        }
+
+        if ($this->is_walkover) {
+            return $this->walkoverWinnerTeam;
+        }
+
+        return $this->player1_sets > $this->player2_sets
+            ? $this->team1
+            : $this->team2;
+    }
+
+    public function losingTeam(): ?Team
+    {
+        if (! $this->completed || ! $this->is_doubles) {
+            return null;
+        }
+
+        if ($this->is_walkover) {
+            return $this->walkover_winner_team_id === $this->team1_id
+                ? $this->team2
+                : $this->team1;
+        }
+
+        return $this->player1_sets < $this->player2_sets
+            ? $this->team1
+            : $this->team2;
     }
 }

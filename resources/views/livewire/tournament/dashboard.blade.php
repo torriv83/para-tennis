@@ -26,15 +26,16 @@
             {{-- Championship Final (only for round_robin_finals format) --}}
             @include('livewire.tournament.partials.championship-final')
 
-            {{-- Doubles Final --}}
-            @include('livewire.tournament.partials.doubles-final')
-
             {{-- Generate Schedule CTA --}}
             @include('livewire.tournament.partials.generate-schedule')
 
         @elseif($activeTab === 'matches')
             {{-- Matches Tab: Full match list --}}
             @include('livewire.tournament.partials.matches-list')
+
+        @elseif($activeTab === 'doubles' && $tournament->has_doubles)
+            {{-- Doubles Tab: Teams, schedule, standings, matches, final --}}
+            @include('livewire.tournament.partials.doubles')
         @endif
 
         {{-- Players Drawer --}}

@@ -92,11 +92,11 @@
             </div>
 
             {{-- Include Doubles --}}
-            <div>
+            <div x-data="{ hasDoubles: @entangle('hasDoubles') }">
                 <label class="flex cursor-pointer items-center gap-3">
                     <input
                         type="checkbox"
-                        wire:model="hasDoubles"
+                        x-model="hasDoubles"
                         class="h-5 w-5 cursor-pointer rounded border-white/20 bg-background/50 text-primary focus:ring-2 focus:ring-primary/20"
                     >
                     <div>
@@ -104,6 +104,27 @@
                         <p class="text-sm text-text-muted">{{ __('messages.include_doubles_desc') }}</p>
                     </div>
                 </label>
+
+                {{-- Doubles Format --}}
+                <div x-show="hasDoubles" x-cloak class="mt-4 pl-8">
+                    <label class="mb-3 block text-sm font-medium text-text-secondary">{{ __('messages.doubles_format') }}</label>
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <label class="group cursor-pointer">
+                            <input type="radio" wire:model="doublesFormat" value="round_robin" class="peer hidden">
+                            <div class="rounded-xl border border-white/10 bg-background/30 p-3 transition peer-checked:border-secondary peer-checked:bg-secondary/10 group-hover:border-white/20">
+                                <span class="font-medium">{{ __('messages.round_robin') }}</span>
+                                <p class="text-sm text-text-muted">{{ __('messages.round_robin_short') }}</p>
+                            </div>
+                        </label>
+                        <label class="group cursor-pointer">
+                            <input type="radio" wire:model="doublesFormat" value="round_robin_finals" class="peer hidden">
+                            <div class="rounded-xl border border-white/10 bg-background/30 p-3 transition peer-checked:border-secondary peer-checked:bg-secondary/10 group-hover:border-white/20">
+                                <span class="font-medium">{{ __('messages.round_robin_finals') }}</span>
+                                <p class="text-sm text-text-muted">{{ __('messages.round_robin_finals_short') }}</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
             </div>
 
             <button

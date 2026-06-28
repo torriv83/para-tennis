@@ -34,7 +34,7 @@ class PredictionService
         $scenarios = $this->generateAllScenarios($incompleteGames);
         $playerPredictions = [];
 
-        foreach ($this->tournament->players as $player) {
+        foreach ($this->tournament->players->where('plays_singles', true) as $player) {
             $playerPredictions[$player->id] = $this->analyzePlayerScenarios($player, $scenarios);
         }
 
@@ -112,7 +112,7 @@ class PredictionService
         $scenarios = [];
 
         // Generate BEST case scenarios (player wins all their remaining games)
-        foreach ($this->tournament->players as $player) {
+        foreach ($this->tournament->players->where('plays_singles', true) as $player) {
             $scenario = [];
             foreach ($games as $game) {
                 if ($game->player1_id === $player->id) {
@@ -152,7 +152,7 @@ class PredictionService
         }
 
         // Generate WORST case scenarios (player loses all their remaining games)
-        foreach ($this->tournament->players as $player) {
+        foreach ($this->tournament->players->where('plays_singles', true) as $player) {
             $scenario = [];
             foreach ($games as $game) {
                 if ($game->player1_id === $player->id) {
@@ -680,7 +680,7 @@ class PredictionService
         }
 
         // For players NOT in the last game, they're just waiting on results
-        foreach ($this->tournament->players as $player) {
+        foreach ($this->tournament->players->where('plays_singles', true) as $player) {
             if (isset($predictions[$player->id])) {
                 continue;
             }
